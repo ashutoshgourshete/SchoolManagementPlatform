@@ -17,7 +17,7 @@ import {
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="page-container">
+    <div>
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
         <div>

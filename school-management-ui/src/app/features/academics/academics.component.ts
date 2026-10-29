@@ -9,27 +9,31 @@ import { AcademicYear, ClassModel, Department, Program, Subject } from '../../co
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="page-container">
-      <div class="flex items-center justify-between mb-6">
+    <div>
+      <div class="flex items-center justify-between mb-5">
         <div>
-          <h1 class="text-2xl font-bold text-slate-900">Academic Structure</h1>
-          <p class="text-sm text-slate-500">Configure academic years, school classes, college degree programs, and curriculum</p>
+          <h1 class="text-2xl font-bold text-slate-900" style="letter-spacing: -0.3px;">Academics &amp; Class Architecture</h1>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Configure school grades, college programs, curriculum, and class section capacities</p>
         </div>
       </div>
 
-      <!-- Tab Navigation -->
-      <div class="tab-bar mb-6">
-        <button [class.active]="activeTab === 'classes'" (click)="activeTab = 'classes'" class="tab-btn">
-          Classes & Sections
+      <!-- Tab Navigation with Rounded Capsules -->
+      <div class="modern-tab-bar mb-6">
+        <button [class.active]="activeTab === 'classes'" (click)="activeTab = 'classes'" class="modern-tab-btn">
+          <span>🏫</span>
+          <span>Classes &amp; Sections</span>
         </button>
-        <button [class.active]="activeTab === 'years'" (click)="activeTab = 'years'" class="tab-btn">
-          Academic Sessions
+        <button [class.active]="activeTab === 'years'" (click)="activeTab = 'years'" class="modern-tab-btn">
+          <span>📅</span>
+          <span>Academic Sessions</span>
         </button>
-        <button [class.active]="activeTab === 'programs'" (click)="activeTab = 'programs'" class="tab-btn">
-          College Programs & Departments
+        <button [class.active]="activeTab === 'programs'" (click)="activeTab = 'programs'" class="modern-tab-btn">
+          <span>🎓</span>
+          <span>College Programs &amp; Departments</span>
         </button>
-        <button [class.active]="activeTab === 'subjects'" (click)="activeTab = 'subjects'" class="tab-btn">
-          Subjects & Credits
+        <button [class.active]="activeTab === 'subjects'" (click)="activeTab = 'subjects'" class="modern-tab-btn">
+          <span>📖</span>
+          <span>Subjects &amp; Credits</span>
         </button>
       </div>
 
