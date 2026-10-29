@@ -35,23 +35,23 @@ import {
       <div class="card mb-6">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div class="flex items-center gap-4">
-            <label class="text-xs font-bold text-slate-600 uppercase">View Mode:</label>
-            <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
+            <span class="view-mode-label">View Mode:</span>
+            <div class="segmented-pill-group">
               <button 
+                type="button"
                 (click)="switchViewMode('class')" 
-                [class.bg-white]="viewMode === 'class'"
-                [class.shadow-sm]="viewMode === 'class'"
-                [class.font-bold]="viewMode === 'class'"
-                class="px-3 py-1.5 rounded-md transition-all text-slate-700">
-                Class Section Grid
+                [class.active]="viewMode === 'class'"
+                class="segmented-pill-btn">
+                <span>🏫</span>
+                <span>Class Section Grid</span>
               </button>
               <button 
+                type="button"
                 (click)="switchViewMode('teacher')" 
-                [class.bg-white]="viewMode === 'teacher'"
-                [class.shadow-sm]="viewMode === 'teacher'"
-                [class.font-bold]="viewMode === 'teacher'"
-                class="px-3 py-1.5 rounded-md transition-all text-slate-700">
-                Teacher Schedule
+                [class.active]="viewMode === 'teacher'"
+                class="segmented-pill-btn">
+                <span>👨‍🏫</span>
+                <span>Teacher Schedule</span>
               </button>
             </div>
           </div>

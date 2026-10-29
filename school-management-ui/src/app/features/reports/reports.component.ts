@@ -31,37 +31,35 @@ import {
       </div>
 
       <!-- Navigation Tabs -->
-      <div class="card mb-6">
-        <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
-          <button 
-            (click)="activeTab = 'executive'" 
-            [class.bg-indigo-600]="activeTab === 'executive'"
-            [class.text-white]="activeTab === 'executive'"
-            class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100">
-            📊 Executive Summary
-          </button>
-          <button 
-            (click)="activeTab = 'financial'" 
-            [class.bg-indigo-600]="activeTab === 'financial'"
-            [class.text-white]="activeTab === 'financial'"
-            class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100">
-            💳 Fees, Defaulters & Receipts
-          </button>
-          <button 
-            (click)="activeTab = 'attendance'" 
-            [class.bg-indigo-600]="activeTab === 'attendance'"
-            [class.text-white]="activeTab === 'attendance'"
-            class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100">
-            📅 Attendance Analytics (< 75% Flag)
-          </button>
-          <button 
-            (click)="activeTab = 'enrollment'" 
-            [class.bg-indigo-600]="activeTab === 'enrollment'"
-            [class.text-white]="activeTab === 'enrollment'"
-            class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-100">
-            👨‍🎓 Enrollment & Demographics
-          </button>
-        </div>
+      <div class="tab-bar mb-6">
+        <button 
+          (click)="activeTab = 'executive'" 
+          [class.active]="activeTab === 'executive'"
+          class="tab-btn">
+          <span>📊</span>
+          <span>Executive Summary</span>
+        </button>
+        <button 
+          (click)="activeTab = 'financial'" 
+          [class.active]="activeTab === 'financial'"
+          class="tab-btn">
+          <span>💳</span>
+          <span>Fees, Defaulters & Receipts</span>
+        </button>
+        <button 
+          (click)="activeTab = 'attendance'" 
+          [class.active]="activeTab === 'attendance'"
+          class="tab-btn">
+          <span>📅</span>
+          <span>Attendance Analytics (< 75% Flag)</span>
+        </button>
+        <button 
+          (click)="activeTab = 'enrollment'" 
+          [class.active]="activeTab === 'enrollment'"
+          class="tab-btn">
+          <span>👨‍🎓</span>
+          <span>Enrollment & Demographics</span>
+        </button>
       </div>
 
       <!-- TAB 1: EXECUTIVE SUMMARY -->

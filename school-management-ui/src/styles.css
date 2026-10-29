@@ -1053,4 +1053,59 @@ body {
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
+/* ==========================================================================
+   Modern View Mode Switcher / Segmented Pill Controls
+   ========================================================================== */
+.view-mode-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-mode-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--slate-500);
+}
+
+.segmented-pill-group {
+  display: inline-flex;
+  align-items: center;
+  background: #F1F5F9;
+  padding: 4px;
+  border-radius: 9999px;
+  border: 1px solid var(--slate-200);
+  gap: 4px;
+}
+
+.segmented-pill-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--slate-600);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  outline: none;
+}
+
+.segmented-pill-btn:hover {
+  color: var(--slate-900);
+}
+
+.segmented-pill-btn.active {
+  background: #FFFFFF;
+  color: #1E5BF6;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+
 
