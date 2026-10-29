@@ -23,6 +23,7 @@ public class StudentsController : ControllerBase
         [FromQuery] int pageIndex = 1,
         [FromQuery] int pageSize = 20,
         [FromQuery] string? search = null,
+        [FromQuery] Guid? classId = null,
         [FromQuery] Guid? classSectionId = null,
         CancellationToken cancellationToken = default)
     {
@@ -33,7 +34,7 @@ public class StudentsController : ControllerBase
             SearchTerm = search
         };
 
-        var result = await _studentService.GetStudentsAsync(filter, classSectionId, cancellationToken);
+        var result = await _studentService.GetStudentsAsync(filter, classSectionId, classId, cancellationToken);
         return Ok(result);
     }
 

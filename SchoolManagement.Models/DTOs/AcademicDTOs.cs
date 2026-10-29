@@ -68,6 +68,8 @@ public class ClassDto
     public string Code { get; set; } = string.Empty;
     public int? SemesterNumber { get; set; }
     public List<ClassSectionDto> Sections { get; set; } = new();
+    public int TotalEnrolledStudents => Sections.Sum(s => s.EnrolledStudentCount);
+    public int TotalCapacity => Sections.Sum(s => s.Capacity);
 }
 
 public class CreateClassDto

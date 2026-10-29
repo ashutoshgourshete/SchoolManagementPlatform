@@ -16,7 +16,7 @@ public class StudentService : IStudentService
         _context = context;
     }
 
-    public async Task<ApiResponse<PagedResult<StudentDto>>> GetStudentsAsync(PaginationFilter filter, Guid? classSectionId = null, CancellationToken cancellationToken = default)
+    public async Task<ApiResponse<PagedResult<StudentDto>>> GetStudentsAsync(PaginationFilter filter, Guid? classSectionId = null, Guid? classId = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Students
             .Include(s => s.Enrollments)

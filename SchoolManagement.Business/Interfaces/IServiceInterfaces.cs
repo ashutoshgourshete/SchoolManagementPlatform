@@ -50,7 +50,7 @@ public interface IAcademicService
 
 public interface IStudentService
 {
-    Task<ApiResponse<PagedResult<StudentDto>>> GetStudentsAsync(PaginationFilter filter, Guid? classSectionId = null, CancellationToken cancellationToken = default);
+    Task<ApiResponse<PagedResult<StudentDto>>> GetStudentsAsync(PaginationFilter filter, Guid? classSectionId = null, Guid? classId = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<StudentDto>> GetStudentByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ApiResponse<StudentDto>> CreateStudentAsync(CreateStudentDto dto, CancellationToken cancellationToken = default);
     Task<ApiResponse<StudentDto>> UpdateStudentAsync(Guid id, UpdateStudentDto dto, CancellationToken cancellationToken = default);
