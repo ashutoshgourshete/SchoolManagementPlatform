@@ -61,15 +61,28 @@ import { Student, ClassModel, PagedResult } from '../../core/models/models';
                 @for (student of pagedResult?.items; track student.id) {
                   <tr>
                     <td class="font-mono font-semibold text-xs text-primary">{{ student.admissionNumber }}</td>
-                    <td class="font-medium text-slate-900">
-                      {{ student.fullName }}
-                      @if (student.rollNumber) {
-                        <span class="text-xs text-slate-400 ml-1">(Roll: {{ student.rollNumber }})</span>
-                      }
+                    <td>
+                      <div class="student-meta-cell">
+                        <div class="avatar-circle">
+                          {{ getInitials(student.fullName) }}
+                        </div>
+                        <div>
+                          <div class="student-name-text">
+                            {{ student.fullName }}
+                            @if (student.rollNumber) {
+                              <span class="text-xs text-slate-400 font-normal ml-1">(Roll: {{ student.rollNumber }})</span>
+                            }
+                          </div>
+                          <div class="phone-meta-text">
+                            <span class="phone-icon-blue">📞</span>
+                            <span>{{ student.emergencyContactPhone || (student.guardians[0].phone) || 'No phone' }}</span>
+                          </div>
+                        </div>
+                      </div>
                     </td>
                     <td>
                       @if (student.currentClassName) {
-                        <span class="badge badge-info">{{ student.currentClassName }} - {{ student.currentSectionName }}</span>
+                        <span class="grade-capsule grade-blue">{{ student.currentClassName }} - {{ student.currentSectionName }}</span>
                       } @else {
                         <span class="text-xs text-slate-400">Unassigned</span>
                       }
@@ -77,19 +90,20 @@ import { Student, ClassModel, PagedResult } from '../../core/models/models';
                     <td>{{ student.gender === 1 ? 'Male' : (student.gender === 2 ? 'Female' : 'Other') }}</td>
                     <td>
                       @if (student.guardians.length > 0) {
-                        <span>{{ student.guardians[0].fullName }}</span>
+                        <span class="font-medium text-slate-700">{{ student.guardians[0].fullName }}</span>
                       } @else {
                         <span class="text-xs text-slate-400">N/A</span>
                       }
                     </td>
                     <td>{{ student.emergencyContactPhone || 'N/A' }}</td>
                     <td>
-                      <span [class]="student.isActive ? 'badge badge-success' : 'badge badge-neutral'">
-                        {{ student.isActive ? 'Active' : 'Inactive' }}
+                      <span [class]="student.isActive ? 'status-capsule status-active' : 'status-capsule status-pending'">
+                        <span class="status-dot"></span>
+                        <span>{{ student.isActive ? 'Active' : 'Inactive' }}</span>
                       </span>
                     </td>
                     <td>
-                      <button (click)="deleteStudent(student.id)" class="btn btn-danger btn-sm">Delete</button>
+                      <button (click)="deleteStudent(student.id)" class="btn btn-outline btn-sm" style="color: #EF4444; border-color: #FECACA;">Delete</button>
                     </td>
                   </tr>
                 }
@@ -332,5 +346,14 @@ export class StudentsComponent implements OnInit {
         }
       });
     }
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'ST';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
   }
 }
