@@ -6,13 +6,17 @@ namespace SchoolManagement.Tests;
 
 public static class TestDbContextFactory
 {
-    public static (ApplicationDbContext Context, CurrentTenantService TenantService) Create(string dbName, Guid? tenantId = null, Guid? institutionId = null)
+    public static (ApplicationDbContext Context, CurrentTenantService TenantService) Create(
+        string dbName,
+        Guid? tenantId = null,
+        Guid? institutionId = null,
+        bool isPlatformAdmin = false)
     {
         var tenantService = new CurrentTenantService
         {
             TenantId = tenantId,
             InstitutionId = institutionId,
-            IsPlatformAdmin = false
+            IsPlatformAdmin = isPlatformAdmin
         };
 
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()

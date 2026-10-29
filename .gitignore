@@ -16,6 +16,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # OS & IDE
+.vs/
+*.vsidx
 .vscode/
 .idea/
 Thumbs.db

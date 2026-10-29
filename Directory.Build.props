@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <EnableWorkloads>false</EnableWorkloads>
+    <NuGetAudit>false</NuGetAudit>
+    <UseSharedCompilation>false</UseSharedCompilation>
+  </PropertyGroup>
+</Project>
