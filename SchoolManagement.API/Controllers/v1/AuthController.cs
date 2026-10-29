@@ -50,6 +50,15 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ApiResponse<ForgotPasswordResponseDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request, CancellationToken cancellationToken)
+    {
+        var result = await _authService.ForgotPasswordAsync(request, cancellationToken);
+        return Ok(result);
+    }
+
     [HttpPost("reset-password")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]

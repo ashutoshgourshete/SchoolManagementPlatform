@@ -42,6 +42,14 @@ export class AuthService {
     );
   }
 
+  forgotPassword(email: string): Observable<ApiResponse<{ message: string; resetToken?: string }>> {
+    return this.http.post<ApiResponse<{ message: string; resetToken?: string }>>(`${this.baseUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(payload: { email: string; token: string; newPassword: string }): Observable<ApiResponse<boolean>> {
+    return this.http.post<ApiResponse<boolean>>(`${this.baseUrl}/reset-password`, payload);
+  }
+
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);

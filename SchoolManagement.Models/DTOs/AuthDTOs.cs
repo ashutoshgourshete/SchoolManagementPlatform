@@ -48,6 +48,17 @@ public class RegisterTenantRequestDto
     public Guid? SelectedPlanId { get; set; }
 }
 
+public class ForgotPasswordRequestDto
+{
+    public string Email { get; set; } = string.Empty;
+}
+
+public class ForgotPasswordResponseDto
+{
+    public string Message { get; set; } = string.Empty;
+    public string? ResetToken { get; set; }
+}
+
 public class ResetPasswordRequestDto
 {
     public string Email { get; set; } = string.Empty;

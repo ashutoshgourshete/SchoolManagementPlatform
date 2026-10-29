@@ -12,7 +12,6 @@
     <ProjectReference Include="..\SchoolManagement.Models\SchoolManagement.Models.csproj" />
     <ProjectReference Include="..\SchoolManagement.Data\SchoolManagement.Data.csproj" />
     <ProjectReference Include="..\SchoolManagement.Business\SchoolManagement.Business.csproj" />
-    <ProjectReference Include="..\SchoolManagement.API\SchoolManagement.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>

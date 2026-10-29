@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { LoginComponent } from './features/auth/login.component';
 import { RegisterTenantComponent } from './features/auth/register-tenant.component';
+import { ForgotPasswordComponent } from './features/auth/forgot-password.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { StudentsComponent } from './features/students/students.component';
 import { StaffComponent } from './features/staff/staff.component';
@@ -16,6 +17,7 @@ import { PlatformAdminComponent } from './features/platform-admin/platform-admin
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register-tenant', component: RegisterTenantComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'students', component: StudentsComponent, canActivate: [authGuard] },
   { path: 'staff', component: StaffComponent, canActivate: [authGuard] },

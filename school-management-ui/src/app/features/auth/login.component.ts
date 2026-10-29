@@ -35,7 +35,7 @@ import { AuthService } from '../../core/services/auth.service';
               required>
           </div>
 
-          <div class="form-group">
+          <div class="form-group mb-2">
             <label class="form-label">Password</label>
             <input 
               type="password" 
@@ -44,6 +44,10 @@ import { AuthService } from '../../core/services/auth.service';
               [(ngModel)]="password" 
               name="password" 
               required>
+          </div>
+
+          <div class="flex justify-end mb-4">
+            <a routerLink="/forgot-password" class="text-xs text-primary font-medium hover:underline">Forgot password?</a>
           </div>
 
           <button type="submit" class="btn btn-primary w-full py-3" [disabled]="loading">

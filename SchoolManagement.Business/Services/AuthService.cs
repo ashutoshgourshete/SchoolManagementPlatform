@@ -322,20 +322,53 @@ public class AuthService : IAuthService
         return ApiResponse<LoginResponseDto>.Ok(response, "Token refreshed successfully");
     }
 
+    public async Task<ApiResponse<ForgotPasswordResponseDto>> ForgotPasswordAsync(ForgotPasswordRequestDto request, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email.Trim());
+        if (user == null || !user.IsActive)
+        {
+            // For security, do not reveal whether user exists
+            return ApiResponse<ForgotPasswordResponseDto>.Ok(new ForgotPasswordResponseDto
+            {
+                Message = "If an account with that email exists, password reset instructions have been generated."
+            });
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        // Record notification log
+        await _context.NotificationLogs.AddAsync(new NotificationLog
+        {
+            Recipient = user.Email ?? string.Empty,
+            Channel = "Email",
+            Subject = "Password Reset Request",
+            Message = $"Password reset token: {token}",
+            Status = "Sent",
+            SentAtUtc = DateTime.UtcNow
+        }, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return ApiResponse<ForgotPasswordResponseDto>.Ok(new ForgotPasswordResponseDto
+        {
+            Message = "Password reset instructions have been generated.",
+            ResetToken = token // Provided for easy development / demo testing
+        });
+    }
+
     public async Task<ApiResponse<bool>> ResetPasswordAsync(ResetPasswordRequestDto request, CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        var user = await _userManager.FindByEmailAsync(request.Email.Trim());
         if (user == null)
         {
-            return ApiResponse<bool>.Fail("User not found.");
+            return ApiResponse<bool>.Fail("Invalid password reset request.");
         }
 
         var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
         if (!result.Succeeded)
         {
-            return ApiResponse<bool>.Fail("Password reset failed", result.Errors.Select(e => e.Description).ToList());
+            return ApiResponse<bool>.Fail("Password reset failed. The token may be expired or invalid.", result.Errors.Select(e => e.Description).ToList());
         }
 
-        return ApiResponse<bool>.Ok(true, "Password has been reset successfully.");
+        return ApiResponse<bool>.Ok(true, "Password has been reset successfully. You can now log in with your new password.");
     }
 }

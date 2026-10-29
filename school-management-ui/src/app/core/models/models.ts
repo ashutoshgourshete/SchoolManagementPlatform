@@ -163,6 +163,16 @@ export interface AttendanceRecord {
   remarks?: string;
 }
 
+export interface AttendanceSummary {
+  studentId: string;
+  studentName: string;
+  totalDays: number;
+  presentDays: number;
+  absentDays: number;
+  lateDays: number;
+  attendancePercentage: number;
+}
+
 export interface Exam {
   id: string;
   courseOfferingId: string;

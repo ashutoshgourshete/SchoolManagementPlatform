@@ -85,18 +85,14 @@ builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 // 5. Add Background Hosted Services
 builder.Services.AddHostedService<AutomatedBillingBackgroundService>();
 
-// 6. Add CORS
-var allowedOrigins = builder.Configuration.GetSection("CorsOrigins").Get<string[]>() 
-    ?? new[] { "http://localhost:4200", "https://localhost:4200" };
-
+// 6. Add Permissive CORS for Local Development
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(allowedOrigins)
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowAnyMethod();
     });
 });
 
@@ -151,10 +147,7 @@ using (var scope = app.Services.CreateScope())
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
-        // Ensure database is created with schema
-        await context.Database.EnsureCreatedAsync();
-
-        // Seed default roles, platform plans, platform admin, and demo academy tenant
+        await context.Database.MigrateAsync();
         await DbSeeder.SeedAsync(context, userManager, roleManager);
     }
     catch (Exception ex)
@@ -167,18 +160,22 @@ using (var scope = app.Services.CreateScope())
 // 9. Configure Pipeline
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+// Enable CORS before other middleware
+app.UseCors();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "School Management API v1");
-        c.RoutePrefix = string.Empty; // Swagger at root for convenience
+        c.RoutePrefix = string.Empty; // Swagger at root
     });
 }
-
-app.UseHttpsRedirection();
-app.UseCors();
+else
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
