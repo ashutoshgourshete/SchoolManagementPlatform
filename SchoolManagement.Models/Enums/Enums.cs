@@ -103,3 +103,11 @@ public enum UserRoleType
     Student = 5,
     Parent = 6
 }
+
+public enum SubmissionStatus
+{
+    Submitted = 1,
+    Late = 2,
+    Graded = 3,
+    ResubmissionRequested = 4
+}

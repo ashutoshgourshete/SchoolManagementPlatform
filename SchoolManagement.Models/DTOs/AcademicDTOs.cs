@@ -146,3 +146,63 @@ public class CreateCourseOfferingDto
     public Guid? TeacherId { get; set; }
     public int? SemesterNumber { get; set; }
 }
+
+public class TimetableSlotDto
+{
+    public Guid Id { get; set; }
+    public Guid CourseOfferingId { get; set; }
+    public string SubjectName { get; set; } = string.Empty;
+    public string SubjectCode { get; set; } = string.Empty;
+    public Guid ClassSectionId { get; set; }
+    public string ClassName { get; set; } = string.Empty;
+    public string SectionName { get; set; } = string.Empty;
+    public Guid? TeacherId { get; set; }
+    public string? TeacherName { get; set; }
+    public DayOfWeek DayOfWeek { get; set; }
+    public string DayName => DayOfWeek.ToString();
+    public TimeSpan StartTime { get; set; }
+    public TimeSpan EndTime { get; set; }
+    public string? RoomNumber { get; set; }
+}
+
+public class ScheduleSlotDto
+{
+    public Guid CourseOfferingId { get; set; }
+    public DayOfWeek DayOfWeek { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public TimeSpan EndTime { get; set; }
+    public string? RoomNumber { get; set; }
+}
+
+public class ConflictDetectionResultDto
+{
+    public bool HasConflict => TeacherConflict || RoomConflict || ClassSectionConflict;
+    public bool TeacherConflict { get; set; }
+    public string? TeacherConflictDetails { get; set; }
+    public bool RoomConflict { get; set; }
+    public string? RoomConflictDetails { get; set; }
+    public bool ClassSectionConflict { get; set; }
+    public string? ClassSectionConflictDetails { get; set; }
+}
+
+public class DayScheduleDto
+{
+    public DayOfWeek DayOfWeek { get; set; }
+    public string DayName => DayOfWeek.ToString();
+    public List<TimetableSlotDto> Slots { get; set; } = new();
+}
+
+public class WeeklyTimetableDto
+{
+    public Guid ClassSectionId { get; set; }
+    public string ClassName { get; set; } = string.Empty;
+    public string SectionName { get; set; } = string.Empty;
+    public List<DayScheduleDto> Days { get; set; } = new();
+}
+
+public class TeacherWeeklyTimetableDto
+{
+    public Guid TeacherId { get; set; }
+    public string TeacherName { get; set; } = string.Empty;
+    public List<DayScheduleDto> Days { get; set; } = new();
+}

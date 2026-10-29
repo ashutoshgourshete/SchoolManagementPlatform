@@ -103,22 +103,61 @@ public class PaymentGatewayService : IPaymentGatewayService
 
             if (dto.EventType == "payment.captured" || dto.EventType == "charge.successful")
             {
-                if (root.TryGetProperty("invoice_id", out var invoiceIdProp) &&
-                    Guid.TryParse(invoiceIdProp.GetString(), out var invoiceId) &&
-                    root.TryGetProperty("amount", out var amountProp))
-                {
-                    var amount = amountProp.GetDecimal();
-                    var transactionId = root.TryGetProperty("payment_id", out var payId) ? payId.GetString() : dto.EventId;
+                Guid? invoiceId = null;
+                decimal amount = 0;
+                var transactionId = dto.EventId;
 
+                // 1. Direct root properties
+                if (root.TryGetProperty("invoice_id", out var rootInvProp) && Guid.TryParse(rootInvProp.GetString(), out var parsedRootId))
+                {
+                    invoiceId = parsedRootId;
+                }
+                // 2. Stripe nested: data.object.metadata.invoice_id
+                else if (root.TryGetProperty("data", out var dataObj) &&
+                         dataObj.TryGetProperty("object", out var stripeObj) &&
+                         stripeObj.TryGetProperty("metadata", out var stripeMeta) &&
+                         stripeMeta.TryGetProperty("invoice_id", out var stripeInvProp) &&
+                         Guid.TryParse(stripeInvProp.GetString(), out var stripeInvId))
+                {
+                    invoiceId = stripeInvId;
+                    if (stripeObj.TryGetProperty("id", out var stripePayId)) transactionId = stripePayId.GetString() ?? dto.EventId;
+                }
+                // 3. Razorpay nested: payload.payment.entity.notes.invoice_id
+                else if (root.TryGetProperty("payload", out var rzpPayload) &&
+                         rzpPayload.TryGetProperty("payment", out var rzpPayment) &&
+                         rzpPayment.TryGetProperty("entity", out var rzpEntity))
+                {
+                    if (rzpEntity.TryGetProperty("notes", out var rzpNotes) &&
+                        rzpNotes.TryGetProperty("invoice_id", out var rzpInvProp) &&
+                        Guid.TryParse(rzpInvProp.GetString(), out var rzpInvId))
+                    {
+                        invoiceId = rzpInvId;
+                    }
+                    if (rzpEntity.TryGetProperty("id", out var rzpPayId)) transactionId = rzpPayId.GetString() ?? dto.EventId;
+                }
+
+                if (root.TryGetProperty("amount", out var amountProp))
+                {
+                    amount = amountProp.GetDecimal();
+                }
+
+                if (root.TryGetProperty("payment_id", out var directPayId))
+                {
+                    transactionId = directPayId.GetString() ?? transactionId;
+                }
+
+                if (invoiceId.HasValue && amount > 0)
+                {
                     var invoice = await _context.StudentInvoices
                         .Include(i => i.Student)
-                        .FirstOrDefaultAsync(i => i.Id == invoiceId, cancellationToken);
+                        .FirstOrDefaultAsync(i => i.Id == invoiceId.Value, cancellationToken);
 
                     if (invoice != null)
                     {
                         var year = DateTime.UtcNow.Year;
                         var paymentCount = await _context.Payments.CountAsync(cancellationToken) + 1;
-                        var receiptNumber = $"RCT-{year}-{paymentCount:D4}";
+                        var uniqueSuffix = Guid.NewGuid().ToString("N")[..6].ToUpperInvariant();
+                        var receiptNumber = $"RCT-{year}{DateTime.UtcNow:MMdd}-{paymentCount:D4}-{uniqueSuffix}";
 
                         var payment = new Payment
                         {

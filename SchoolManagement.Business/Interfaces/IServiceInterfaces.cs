@@ -121,3 +121,33 @@ public interface IAnnouncementService
     Task<ApiResponse<List<AnnouncementDto>>> GetAnnouncementsAsync(string? targetAudience = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<AnnouncementDto>> CreateAnnouncementAsync(CreateAnnouncementDto dto, CancellationToken cancellationToken = default);
 }
+
+public interface ITimetableService
+{
+    Task<ApiResponse<ConflictDetectionResultDto>> DetectConflictsAsync(ScheduleSlotDto dto, Guid? excludeSlotId = null, CancellationToken cancellationToken = default);
+    Task<ApiResponse<TimetableSlotDto>> ScheduleSlotAsync(ScheduleSlotDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<WeeklyTimetableDto>> GetClassSectionWeeklyTimetableAsync(Guid classSectionId, CancellationToken cancellationToken = default);
+    Task<ApiResponse<TeacherWeeklyTimetableDto>> GetTeacherWeeklyTimetableAsync(Guid teacherId, CancellationToken cancellationToken = default);
+    Task<ApiResponse<List<TimetableSlotDto>>> GetRoomScheduleAsync(string roomNumber, DayOfWeek? dayOfWeek = null, CancellationToken cancellationToken = default);
+    Task<ApiResponse<bool>> DeleteSlotAsync(Guid slotId, CancellationToken cancellationToken = default);
+}
+
+public interface IAssignmentService
+{
+    Task<ApiResponse<List<AssignmentDto>>> GetAssignmentsAsync(Guid? classSectionId = null, Guid? courseOfferingId = null, CancellationToken cancellationToken = default);
+    Task<ApiResponse<AssignmentDto>> GetAssignmentByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<ApiResponse<AssignmentDto>> CreateAssignmentAsync(CreateAssignmentDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<AssignmentSubmissionDto>> SubmitAssignmentAsync(SubmitAssignmentDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<List<AssignmentSubmissionDto>>> GetAssignmentSubmissionsAsync(Guid assignmentId, CancellationToken cancellationToken = default);
+    Task<ApiResponse<AssignmentSubmissionDto>> GradeSubmissionAsync(GradeSubmissionDto dto, Guid? teacherStaffId = null, CancellationToken cancellationToken = default);
+    Task<ApiResponse<List<AssignmentSubmissionDto>>> GetStudentSubmissionsAsync(Guid studentId, CancellationToken cancellationToken = default);
+    Task<ApiResponse<bool>> DeleteAssignmentAsync(Guid id, CancellationToken cancellationToken = default);
+}
+
+public interface IReportsService
+{
+    Task<ApiResponse<EnrollmentDemographicsReportDto>> GetEnrollmentDemographicsReportAsync(Guid? academicYearId = null, CancellationToken cancellationToken = default);
+    Task<ApiResponse<AttendanceAnalyticsReportDto>> GetAttendanceAnalyticsReportAsync(Guid? classSectionId = null, DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default);
+    Task<ApiResponse<FinancialCollectionReportDto>> GetFinancialCollectionReportAsync(DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default);
+    Task<ApiResponse<ExecutiveSummaryReportDto>> GetExecutiveSummaryReportAsync(CancellationToken cancellationToken = default);
+}

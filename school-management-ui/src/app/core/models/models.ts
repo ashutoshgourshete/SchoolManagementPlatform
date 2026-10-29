@@ -277,9 +277,10 @@ export interface PaymentReceipt {
   invoiceNumber?: string;
   amount: number;
   currencyCode: string;
-  method: number;
+  method: number | string;
   status: number;
   notes?: string;
+  collectedBy?: string;
 }
 
 export interface OutstandingBalance {
@@ -339,4 +340,183 @@ export interface Announcement {
   targetAudience: string;
   publishedAtUtc: string;
   isPinned: boolean;
+}
+
+export interface CourseOffering {
+  id: string;
+  academicYearId: string;
+  academicYearName: string;
+  subjectId: string;
+  subjectName: string;
+  subjectCode: string;
+  classSectionId: string;
+  sectionName: string;
+  className: string;
+  teacherId?: string;
+  teacherName?: string;
+  semesterNumber?: number;
+}
+
+export interface TimetableSlot {
+  id: string;
+  courseOfferingId: string;
+  subjectName: string;
+  subjectCode: string;
+  classSectionId: string;
+  className: string;
+  sectionName: string;
+  teacherId?: string;
+  teacherName?: string;
+  dayOfWeek: number;
+  dayName: string;
+  startTime: string;
+  endTime: string;
+  roomNumber?: string;
+}
+
+export interface ScheduleSlotPayload {
+  courseOfferingId: string;
+  dayOfWeek: number;
+  startTime: string; // e.g. "09:00:00"
+  endTime: string;   // e.g. "09:50:00"
+  roomNumber?: string;
+}
+
+export interface ConflictDetectionResult {
+  hasConflict: boolean;
+  teacherConflict: boolean;
+  teacherConflictDetails?: string;
+  roomConflict: boolean;
+  roomConflictDetails?: string;
+  classSectionConflict: boolean;
+  classSectionConflictDetails?: string;
+}
+
+export interface DaySchedule {
+  dayOfWeek: number;
+  dayName: string;
+  slots: TimetableSlot[];
+}
+
+export interface WeeklyTimetable {
+  classSectionId: string;
+  className: string;
+  sectionName: string;
+  days: DaySchedule[];
+}
+
+export interface TeacherWeeklyTimetable {
+  teacherId: string;
+  teacherName: string;
+  days: DaySchedule[];
+}
+
+export interface Assignment {
+  id: string;
+  courseOfferingId: string;
+  subjectName: string;
+  subjectCode: string;
+  classSectionId: string;
+  className: string;
+  sectionName: string;
+  teacherId?: string;
+  teacherName?: string;
+  title: string;
+  description: string;
+  attachmentUrl?: string;
+  attachmentFileName?: string;
+  maxPoints: number;
+  dueDateUtc: string;
+  isPublished: boolean;
+  totalSubmissions: number;
+  gradedSubmissions: number;
+}
+
+export interface AssignmentSubmission {
+  id: string;
+  assignmentId: string;
+  assignmentTitle: string;
+  maxPoints: number;
+  dueDateUtc: string;
+  studentId: string;
+  studentName: string;
+  admissionNumber: string;
+  submissionText?: string;
+  fileUrl?: string;
+  fileName?: string;
+  submittedAtUtc: string;
+  status: number;
+  statusName: string;
+  obtainedPoints?: number;
+  teacherFeedback?: string;
+  gradedAtUtc?: string;
+  gradedByName?: string;
+}
+
+export interface ClassEnrollmentStat {
+  classId: string;
+  className: string;
+  classSectionId: string;
+  sectionName: string;
+  capacity: number;
+  totalEnrolled: number;
+  maleCount: number;
+  femaleCount: number;
+  occupancyRate: number;
+}
+
+export interface EnrollmentDemographicsReport {
+  totalStudents: number;
+  totalClasses: number;
+  totalSections: number;
+  totalMale: number;
+  totalFemale: number;
+  overallOccupancyRate: number;
+  classStats: ClassEnrollmentStat[];
+}
+
+export interface StudentAttendanceReportItem {
+  studentId: string;
+  studentName: string;
+  admissionNumber: string;
+  className: string;
+  sectionName: string;
+  guardianPhone?: string;
+  totalSessions: number;
+  presentCount: number;
+  absentCount: number;
+  lateCount: number;
+  attendancePercentage: number;
+  isCriticalDefaulter: boolean;
+}
+
+export interface AttendanceAnalyticsReport {
+  overallAttendanceRate: number;
+  totalStudentsEvaluated: number;
+  criticalDefaultersCount: number;
+  records: StudentAttendanceReportItem[];
+}
+
+export interface PaymentMethodBreakdown {
+  method: string;
+  transactionCount: number;
+  totalAmount: number;
+}
+
+export interface FinancialCollectionReport {
+  totalInvoicedAmount: number;
+  totalCollectedAmount: number;
+  totalOutstandingAmount: number;
+  collectionEfficiencyRate: number;
+  methodBreakdown: PaymentMethodBreakdown[];
+  recentReceipts: PaymentReceipt[];
+}
+
+export interface ExecutiveSummaryReport {
+  institutionName: string;
+  academicYear: string;
+  generatedAtUtc: string;
+  enrollment: EnrollmentDemographicsReport;
+  attendance: AttendanceAnalyticsReport;
+  financials: FinancialCollectionReport;
 }

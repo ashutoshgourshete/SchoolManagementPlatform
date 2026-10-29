@@ -74,4 +74,28 @@ public class StudentServiceTests
         Assert.Equal(1, paged.Data!.TotalCount);
         Assert.Equal("Albert", paged.Data.Items[0].FirstName);
     }
+
+    [Fact]
+    public async Task DeleteEntity_ShouldBeInterceptedAsSoftDelete()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        var tenantId = Guid.NewGuid();
+        var (context, _) = TestDbContextFactory.Create(dbName, tenantId);
+        var studentService = new StudentService(context);
+
+        var created = await studentService.CreateStudentAsync(new CreateStudentDto { AdmissionNumber = "SD-1", FirstName = "Marie", LastName = "Curie" });
+        Assert.True(created.Success);
+
+        // Delete using service
+        var deleteResult = await studentService.DeleteStudentAsync(created.Data!.Id);
+        Assert.True(deleteResult.Success);
+
+        // Verify entity is marked IsDeleted in database
+        var rawStudent = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(
+            Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.IgnoreQueryFilters(context.Students),
+            s => s.Id == created.Data.Id);
+
+        Assert.NotNull(rawStudent);
+        Assert.True(rawStudent!.IsDeleted);
+    }
 }

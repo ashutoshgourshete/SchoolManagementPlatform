@@ -351,7 +351,8 @@ public class FeeManagementService : IFeeManagementService
 
         var year = DateTime.UtcNow.Year;
         var paymentCount = await _context.Payments.CountAsync(cancellationToken) + 1;
-        var receiptNumber = $"RCT-{year}-{paymentCount:D4}";
+        var uniqueSuffix = Guid.NewGuid().ToString("N")[..6].ToUpperInvariant();
+        var receiptNumber = $"RCT-{year}{DateTime.UtcNow:MMdd}-{paymentCount:D4}-{uniqueSuffix}";
 
         var payment = new Payment
         {

@@ -44,6 +44,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<Exam> Exams => Set<Exam>();
     public DbSet<ExamResult> ExamResults => Set<ExamResult>();
     public DbSet<Announcement> Announcements => Set<Announcement>();
+    public DbSet<Assignment> Assignments => Set<Assignment>();
+    public DbSet<AssignmentSubmission> AssignmentSubmissions => Set<AssignmentSubmission>();
 
     public DbSet<FeeStructure> FeeStructures => Set<FeeStructure>();
     public DbSet<FeeStructureItem> FeeStructureItems => Set<FeeStructureItem>();
@@ -135,6 +137,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<Announcement>().HasQueryFilter(e => !e.IsDeleted &&
             (_currentTenantService.IsPlatformAdmin || !_currentTenantService.TenantId.HasValue || e.TenantId == _currentTenantService.TenantId));
 
+        builder.Entity<Assignment>().HasQueryFilter(e => !e.IsDeleted &&
+            (_currentTenantService.IsPlatformAdmin || !_currentTenantService.TenantId.HasValue || e.TenantId == _currentTenantService.TenantId));
+
+        builder.Entity<AssignmentSubmission>().HasQueryFilter(e => !e.IsDeleted &&
+            (_currentTenantService.IsPlatformAdmin || !_currentTenantService.TenantId.HasValue || e.TenantId == _currentTenantService.TenantId));
+
         builder.Entity<FeeStructure>().HasQueryFilter(e => !e.IsDeleted &&
             (_currentTenantService.IsPlatformAdmin || !_currentTenantService.TenantId.HasValue || e.TenantId == _currentTenantService.TenantId));
 
@@ -167,6 +175,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<StudentInvoice>().HasIndex(i => new { i.TenantId, i.InvoiceNumber }).IsUnique();
         builder.Entity<Payment>().HasIndex(p => new { p.TenantId, p.ReceiptNumber }).IsUnique();
         builder.Entity<PaymentWebhookEvent>().HasIndex(w => new { w.ProviderName, w.EventId }).IsUnique();
+        builder.Entity<AssignmentSubmission>().HasIndex(s => new { s.AssignmentId, s.StudentId }).IsUnique();
 
         // Relationships with multiple navigations between same types
         builder.Entity<Department>()
@@ -223,9 +232,27 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .WithMany(s => s.StudentGuardians)
             .HasForeignKey(sg => sg.StudentId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<AssignmentSubmission>()
+            .HasOne(asub => asub.Assignment)
+            .WithMany(a => a.Submissions)
+            .HasForeignKey(asub => asub.AssignmentId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        ApplyAuditAndSoftDelete();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override int SaveChanges()
+    {
+        ApplyAuditAndSoftDelete();
+        return base.SaveChanges();
+    }
+
+    private void ApplyAuditAndSoftDelete()
     {
         var entries = ChangeTracker.Entries<BaseEntity>();
         var utcNow = DateTime.UtcNow;
@@ -258,8 +285,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 entry.Entity.UpdatedAtUtc = utcNow;
                 entry.Entity.UpdatedBy = _currentTenantService.UserId?.ToString();
             }
+            else if (entry.State == EntityState.Deleted)
+            {
+                // Intercept physical delete and convert to soft delete
+                entry.State = EntityState.Modified;
+                entry.Entity.IsDeleted = true;
+                entry.Entity.UpdatedAtUtc = utcNow;
+                entry.Entity.UpdatedBy = _currentTenantService.UserId?.ToString();
+            }
         }
-
-        return base.SaveChangesAsync(cancellationToken);
     }
 }

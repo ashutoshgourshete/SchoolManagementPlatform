@@ -45,6 +45,11 @@ import { AuthService } from '../../../core/services/auth.service';
           <span>Academics & Classes</span>
         </a>
 
+        <a routerLink="/timetables" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">⏱</span>
+          <span>Timetable & Scheduling</span>
+        </a>
+
         <a routerLink="/attendance" routerLinkActive="active" class="nav-item">
           <span class="nav-icon">📅</span>
           <span>Daily Attendance</span>
@@ -55,9 +60,19 @@ import { AuthService } from '../../../core/services/auth.service';
           <span>Exams & Results</span>
         </a>
 
+        <a routerLink="/assignments" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">📂</span>
+          <span>Homework & Assignments</span>
+        </a>
+
         <a routerLink="/fees" routerLinkActive="active" class="nav-item">
           <span class="nav-icon">💳</span>
           <span>Fees & Invoices</span>
+        </a>
+
+        <a routerLink="/reports" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span>Essential Reports</span>
         </a>
 
         <a routerLink="/announcements" routerLinkActive="active" class="nav-item">

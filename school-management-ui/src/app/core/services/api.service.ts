@@ -25,7 +25,19 @@ import {
   DashboardAnalytics,
   PlatformPlan,
   TenantSubscription,
-  Announcement
+  Announcement,
+  CourseOffering,
+  TimetableSlot,
+  ScheduleSlotPayload,
+  ConflictDetectionResult,
+  WeeklyTimetable,
+  TeacherWeeklyTimetable,
+  Assignment,
+  AssignmentSubmission,
+  EnrollmentDemographicsReport,
+  AttendanceAnalyticsReport,
+  FinancialCollectionReport,
+  ExecutiveSummaryReport
 } from '../models/models';
 
 @Injectable({
@@ -222,5 +234,107 @@ export class ApiService {
 
   createAnnouncement(payload: any): Observable<ApiResponse<Announcement>> {
     return this.http.post<ApiResponse<Announcement>>(`${this.baseUrl}/announcements`, payload);
+  }
+
+  // Timetables & Scheduling Engine
+  getCourseOfferings(academicYearId?: string, classSectionId?: string): Observable<ApiResponse<CourseOffering[]>> {
+    let params = new HttpParams();
+    if (academicYearId) params = params.set('academicYearId', academicYearId);
+    if (classSectionId) params = params.set('classSectionId', classSectionId);
+    return this.http.get<ApiResponse<CourseOffering[]>>(`${this.baseUrl}/timetables/course-offerings`, { params });
+  }
+
+  createCourseOffering(payload: any): Observable<ApiResponse<CourseOffering>> {
+    return this.http.post<ApiResponse<CourseOffering>>(`${this.baseUrl}/timetables/course-offerings`, payload);
+  }
+
+  detectTimetableConflicts(payload: ScheduleSlotPayload, excludeSlotId?: string): Observable<ApiResponse<ConflictDetectionResult>> {
+    let params = new HttpParams();
+    if (excludeSlotId) params = params.set('excludeSlotId', excludeSlotId);
+    return this.http.post<ApiResponse<ConflictDetectionResult>>(`${this.baseUrl}/timetables/detect-conflicts`, payload, { params });
+  }
+
+  scheduleTimetableSlot(payload: ScheduleSlotPayload): Observable<ApiResponse<TimetableSlot>> {
+    return this.http.post<ApiResponse<TimetableSlot>>(`${this.baseUrl}/timetables/slots`, payload);
+  }
+
+  getClassSectionWeeklyTimetable(classSectionId: string): Observable<ApiResponse<WeeklyTimetable>> {
+    return this.http.get<ApiResponse<WeeklyTimetable>>(`${this.baseUrl}/timetables/class-sections/${classSectionId}`);
+  }
+
+  getTeacherWeeklyTimetable(teacherId: string): Observable<ApiResponse<TeacherWeeklyTimetable>> {
+    return this.http.get<ApiResponse<TeacherWeeklyTimetable>>(`${this.baseUrl}/timetables/teachers/${teacherId}`);
+  }
+
+  getRoomSchedule(roomNumber: string, dayOfWeek?: number): Observable<ApiResponse<TimetableSlot[]>> {
+    let params = new HttpParams();
+    if (dayOfWeek !== undefined) params = params.set('dayOfWeek', dayOfWeek);
+    return this.http.get<ApiResponse<TimetableSlot[]>>(`${this.baseUrl}/timetables/rooms/${encodeURIComponent(roomNumber)}`, { params });
+  }
+
+  deleteTimetableSlot(slotId: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/timetables/slots/${slotId}`);
+  }
+
+  // Homework & Assignments
+  getAssignments(classSectionId?: string, courseOfferingId?: string): Observable<ApiResponse<Assignment[]>> {
+    let params = new HttpParams();
+    if (classSectionId) params = params.set('classSectionId', classSectionId);
+    if (courseOfferingId) params = params.set('courseOfferingId', courseOfferingId);
+    return this.http.get<ApiResponse<Assignment[]>>(`${this.baseUrl}/assignments`, { params });
+  }
+
+  getAssignmentById(id: string): Observable<ApiResponse<Assignment>> {
+    return this.http.get<ApiResponse<Assignment>>(`${this.baseUrl}/assignments/${id}`);
+  }
+
+  createAssignment(payload: any): Observable<ApiResponse<Assignment>> {
+    return this.http.post<ApiResponse<Assignment>>(`${this.baseUrl}/assignments`, payload);
+  }
+
+  deleteAssignment(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/assignments/${id}`);
+  }
+
+  submitAssignment(assignmentId: string, payload: any): Observable<ApiResponse<AssignmentSubmission>> {
+    return this.http.post<ApiResponse<AssignmentSubmission>>(`${this.baseUrl}/assignments/${assignmentId}/submissions`, payload);
+  }
+
+  getAssignmentSubmissions(assignmentId: string): Observable<ApiResponse<AssignmentSubmission[]>> {
+    return this.http.get<ApiResponse<AssignmentSubmission[]>>(`${this.baseUrl}/assignments/${assignmentId}/submissions`);
+  }
+
+  gradeSubmission(payload: any): Observable<ApiResponse<AssignmentSubmission>> {
+    return this.http.post<ApiResponse<AssignmentSubmission>>(`${this.baseUrl}/assignments/submissions/grade`, payload);
+  }
+
+  getStudentSubmissions(studentId: string): Observable<ApiResponse<AssignmentSubmission[]>> {
+    return this.http.get<ApiResponse<AssignmentSubmission[]>>(`${this.baseUrl}/assignments/student/${studentId}`);
+  }
+
+  // Essential Reports
+  getEnrollmentReport(academicYearId?: string): Observable<ApiResponse<EnrollmentDemographicsReport>> {
+    let params = new HttpParams();
+    if (academicYearId) params = params.set('academicYearId', academicYearId);
+    return this.http.get<ApiResponse<EnrollmentDemographicsReport>>(`${this.baseUrl}/reports/enrollment`, { params });
+  }
+
+  getAttendanceReport(classSectionId?: string, startDate?: string, endDate?: string): Observable<ApiResponse<AttendanceAnalyticsReport>> {
+    let params = new HttpParams();
+    if (classSectionId) params = params.set('classSectionId', classSectionId);
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    return this.http.get<ApiResponse<AttendanceAnalyticsReport>>(`${this.baseUrl}/reports/attendance`, { params });
+  }
+
+  getFinancialReport(startDate?: string, endDate?: string): Observable<ApiResponse<FinancialCollectionReport>> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    return this.http.get<ApiResponse<FinancialCollectionReport>>(`${this.baseUrl}/reports/financial`, { params });
+  }
+
+  getExecutiveReport(): Observable<ApiResponse<ExecutiveSummaryReport>> {
+    return this.http.get<ApiResponse<ExecutiveSummaryReport>>(`${this.baseUrl}/reports/executive`);
   }
 }

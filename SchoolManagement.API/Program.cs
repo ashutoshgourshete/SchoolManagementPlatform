@@ -81,6 +81,9 @@ builder.Services.AddScoped<IPaymentGatewayService, PaymentGatewayService>();
 builder.Services.AddScoped<ISubscriptionBillingService, SubscriptionBillingService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
+builder.Services.AddScoped<ITimetableService, TimetableService>();
+builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+builder.Services.AddScoped<IReportsService, ReportsService>();
 
 // 5. Add Background Hosted Services
 builder.Services.AddHostedService<AutomatedBillingBackgroundService>();
