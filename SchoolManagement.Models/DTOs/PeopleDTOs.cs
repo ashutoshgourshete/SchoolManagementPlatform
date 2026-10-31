@@ -108,6 +108,10 @@ public class StaffDto
     public string Phone { get; set; } = string.Empty;
     public DateTime JoiningDate { get; set; }
     public bool IsActive { get; set; }
+    public Guid? ReportsToStaffId { get; set; }
+    public string? ReportsToName { get; set; }
+    public string? ReportsToDesignation { get; set; }
+    public int SubordinatesCount { get; set; }
 }
 
 public class CreateStaffDto
@@ -122,6 +126,21 @@ public class CreateStaffDto
     public string Phone { get; set; } = string.Empty;
     public DateTime JoiningDate { get; set; } = DateTime.UtcNow;
     public UserRoleType Role { get; set; } = UserRoleType.Teacher;
+    public Guid? ReportsToStaffId { get; set; }
+}
+
+public class StaffHierarchyDto
+{
+    public Guid Id { get; set; }
+    public string EmployeeCode { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
+    public string Designation { get; set; } = string.Empty;
+    public string? DepartmentName { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public Guid? ReportsToStaffId { get; set; }
+    public string? ReportsToName { get; set; }
+    public List<StaffHierarchyDto> DirectReports { get; set; } = new();
 }
 
 public class EnrollmentDto

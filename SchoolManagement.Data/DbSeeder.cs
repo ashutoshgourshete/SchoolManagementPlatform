@@ -297,6 +297,79 @@ public static class DbSeeder
             };
             await context.Programs.AddAsync(btechProgram);
 
+            // Hierarchy Seed: Director -> Principal -> Vice Principal -> HOD -> Teacher
+            var directorStaff = new Staff
+            {
+                TenantId = tenant.Id,
+                InstitutionId = institution.Id,
+                EmployeeCode = "DIR-001",
+                FirstName = "Dr. Rajeshwar",
+                LastName = "Sharma",
+                Designation = "Director",
+                Department = dept,
+                Qualification = "Ph.D Educational Leadership, M.Sc",
+                Email = "director@school.com",
+                Phone = "+91 98765 00001",
+                JoiningDate = new DateTime(2020, 1, 15),
+                IsActive = true
+            };
+            await context.StaffMembers.AddAsync(directorStaff);
+
+            var principalStaff = new Staff
+            {
+                TenantId = tenant.Id,
+                InstitutionId = institution.Id,
+                EmployeeCode = "PRN-001",
+                FirstName = "Prof. Sunita",
+                LastName = "Kulkarni",
+                Designation = "Principal",
+                Department = dept,
+                Qualification = "Ph.D Physics, M.Ed",
+                Email = "principal@school.com",
+                Phone = "+91 98765 00002",
+                JoiningDate = new DateTime(2021, 4, 1),
+                ReportsToStaff = directorStaff,
+                IsActive = true
+            };
+            await context.StaffMembers.AddAsync(principalStaff);
+
+            var vicePrincipalStaff = new Staff
+            {
+                TenantId = tenant.Id,
+                InstitutionId = institution.Id,
+                EmployeeCode = "VPR-001",
+                FirstName = "Dr. Arvind",
+                LastName = "Narayan",
+                Designation = "Vice Principal",
+                Department = dept,
+                Qualification = "M.Sc Chemistry, M.Phil, B.Ed",
+                Email = "viceprincipal@school.com",
+                Phone = "+91 98765 00003",
+                JoiningDate = new DateTime(2022, 6, 1),
+                ReportsToStaff = principalStaff,
+                IsActive = true
+            };
+            await context.StaffMembers.AddAsync(vicePrincipalStaff);
+
+            var hodStaff = new Staff
+            {
+                TenantId = tenant.Id,
+                InstitutionId = institution.Id,
+                EmployeeCode = "HOD-001",
+                FirstName = "Prof. Meenakshi",
+                LastName = "Sundaram",
+                Designation = "Head of Department (Science)",
+                Department = dept,
+                Qualification = "M.Sc Mathematics, Ph.D",
+                Email = "hod.science@school.com",
+                Phone = "+91 98765 00004",
+                JoiningDate = new DateTime(2022, 8, 10),
+                ReportsToStaff = vicePrincipalStaff,
+                IsActive = true
+            };
+            await context.StaffMembers.AddAsync(hodStaff);
+            dept.HeadOfDepartment = hodStaff;
+
             // Staff Member (Teacher)
             var staff = new Staff
             {
@@ -312,6 +385,7 @@ public static class DbSeeder
                 Email = teacherEmail,
                 Phone = "+91 98765 11111",
                 JoiningDate = new DateTime(2023, 6, 1),
+                ReportsToStaff = hodStaff,
                 IsActive = true
             };
             await context.StaffMembers.AddAsync(staff);

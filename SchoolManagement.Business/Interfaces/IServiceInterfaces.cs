@@ -63,6 +63,7 @@ public interface IStaffService
     Task<ApiResponse<PagedResult<StaffDto>>> GetStaffAsync(PaginationFilter filter, Guid? departmentId = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<StaffDto>> GetStaffByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ApiResponse<StaffDto>> CreateStaffAsync(CreateStaffDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<List<StaffHierarchyDto>>> GetHierarchyTreeAsync(CancellationToken cancellationToken = default);
 }
 
 public interface IAttendanceService

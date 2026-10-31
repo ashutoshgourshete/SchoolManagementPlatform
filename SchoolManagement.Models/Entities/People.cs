@@ -86,8 +86,13 @@ public class Staff : BaseEntity, IInstitutionEntity
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string FullName => $"{FirstName} {LastName}".Trim();
-    public string Designation { get; set; } = "Teacher"; // e.g. Teacher, HOD, Principal, Accountant, Clerk
+    public string Designation { get; set; } = "Teacher"; // e.g. Director, Principal, Vice Principal, HOD, Teacher
     
+    // Organizational Hierarchy (Reports to Director / Principal / HOD)
+    public Guid? ReportsToStaffId { get; set; }
+    public Staff? ReportsToStaff { get; set; }
+    public ICollection<Staff> DirectReports { get; set; } = new List<Staff>();
+
     public Guid? DepartmentId { get; set; }
     public Department? Department { get; set; }
 

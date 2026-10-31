@@ -7,6 +7,7 @@ import {
   PagedResult,
   Student,
   Staff,
+  StaffHierarchyNode,
   AcademicYear,
   Department,
   Program,
@@ -90,6 +91,10 @@ export class ApiService {
 
   createStaff(payload: any): Observable<ApiResponse<Staff>> {
     return this.http.post<ApiResponse<Staff>>(`${this.baseUrl}/staff`, payload);
+  }
+
+  getStaffHierarchy(): Observable<ApiResponse<StaffHierarchyNode[]>> {
+    return this.http.get<ApiResponse<StaffHierarchyNode[]>>(`${this.baseUrl}/staff/hierarchy`);
   }
 
   // Academics

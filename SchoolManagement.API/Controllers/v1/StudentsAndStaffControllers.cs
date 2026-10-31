@@ -114,6 +114,13 @@ public class StaffController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("hierarchy")]
+    public async Task<IActionResult> GetHierarchy(CancellationToken cancellationToken)
+    {
+        var result = await _staffService.GetHierarchyTreeAsync(cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetStaffById(Guid id, CancellationToken cancellationToken)
     {

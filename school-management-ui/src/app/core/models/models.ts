@@ -86,6 +86,23 @@ export interface Staff {
   phone: string;
   joiningDate: string;
   isActive: boolean;
+  reportsToStaffId?: string;
+  reportsToName?: string;
+  reportsToDesignation?: string;
+  subordinatesCount?: number;
+}
+
+export interface StaffHierarchyNode {
+  id: string;
+  employeeCode: string;
+  fullName: string;
+  designation: string;
+  departmentName?: string;
+  email: string;
+  phone: string;
+  reportsToStaffId?: string;
+  reportsToName?: string;
+  directReports?: StaffHierarchyNode[];
 }
 
 export interface AcademicYear {
