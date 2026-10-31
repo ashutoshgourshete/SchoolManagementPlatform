@@ -122,9 +122,10 @@ export class ApiService {
     return this.http.post<ApiResponse<Program>>(`${this.baseUrl}/academic/programs`, payload);
   }
 
-  getClasses(academicYearId?: string): Observable<ApiResponse<ClassModel[]>> {
+  getClasses(academicYearId?: string, institutionId?: string): Observable<ApiResponse<ClassModel[]>> {
     let params = new HttpParams();
     if (academicYearId) params = params.set('academicYearId', academicYearId);
+    if (institutionId) params = params.set('institutionId', institutionId);
     return this.http.get<ApiResponse<ClassModel[]>>(`${this.baseUrl}/academic/classes`, { params });
   }
 
@@ -132,8 +133,16 @@ export class ApiService {
     return this.http.post<ApiResponse<ClassModel>>(`${this.baseUrl}/academic/classes`, payload);
   }
 
+  deleteClass(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/academic/classes/${id}`);
+  }
+
   createSection(payload: any): Observable<ApiResponse<ClassSection>> {
     return this.http.post<ApiResponse<ClassSection>>(`${this.baseUrl}/academic/sections`, payload);
+  }
+
+  deleteSection(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/academic/sections/${id}`);
   }
 
   getSubjects(): Observable<ApiResponse<Subject[]>> {

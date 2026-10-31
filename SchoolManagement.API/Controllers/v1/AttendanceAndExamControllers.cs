@@ -29,7 +29,7 @@ public class AttendanceController : ControllerBase
     }
 
     [HttpPost("bulk")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> SaveBulkAttendance([FromBody] BulkAttendanceDto dto, CancellationToken cancellationToken)
     {
         var result = await _attendanceService.SaveBulkAttendanceAsync(dto, cancellationToken);
@@ -69,7 +69,7 @@ public class ExaminationsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateExam([FromBody] CreateExamDto dto, CancellationToken cancellationToken)
     {
         var result = await _examinationService.CreateExamAsync(dto, cancellationToken);
@@ -85,7 +85,7 @@ public class ExaminationsController : ControllerBase
     }
 
     [HttpPost("results/bulk")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> SubmitBulkExamResults([FromBody] BulkExamResultDto dto, CancellationToken cancellationToken)
     {
         var result = await _examinationService.SubmitBulkExamResultsAsync(dto, cancellationToken);

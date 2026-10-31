@@ -33,7 +33,7 @@ public class TimetablesController : ControllerBase
     }
 
     [HttpPost("course-offerings")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateCourseOffering(
         [FromBody] CreateCourseOfferingDto dto,
         CancellationToken cancellationToken)
@@ -44,7 +44,7 @@ public class TimetablesController : ControllerBase
     }
 
     [HttpPost("detect-conflicts")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> DetectConflicts(
         [FromBody] ScheduleSlotDto dto,
         [FromQuery] Guid? excludeSlotId,
@@ -55,7 +55,7 @@ public class TimetablesController : ControllerBase
     }
 
     [HttpPost("slots")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> ScheduleSlot(
         [FromBody] ScheduleSlotDto dto,
         CancellationToken cancellationToken)
@@ -96,7 +96,7 @@ public class TimetablesController : ControllerBase
     }
 
     [HttpDelete("slots/{id:guid}")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> DeleteSlot(
         Guid id,
         CancellationToken cancellationToken)

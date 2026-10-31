@@ -134,6 +134,8 @@ export interface Program {
 
 export interface ClassModel {
   id: string;
+  institutionId?: string;
+  institutionName?: string;
   academicYearId: string;
   academicYearName: string;
   departmentId?: string;
@@ -148,6 +150,7 @@ export interface ClassModel {
 
 export interface ClassSection {
   id: string;
+  institutionId?: string;
   classId: string;
   className: string;
   name: string;

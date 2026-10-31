@@ -35,11 +35,13 @@ public interface IAcademicService
     Task<ApiResponse<List<ProgramDto>>> GetProgramsAsync(CancellationToken cancellationToken = default);
     Task<ApiResponse<ProgramDto>> CreateProgramAsync(CreateProgramDto dto, CancellationToken cancellationToken = default);
 
-    Task<ApiResponse<List<ClassDto>>> GetClassesAsync(Guid? academicYearId = null, CancellationToken cancellationToken = default);
+    Task<ApiResponse<List<ClassDto>>> GetClassesAsync(Guid? academicYearId = null, Guid? institutionId = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<ClassDto>> CreateClassAsync(CreateClassDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<bool>> DeleteClassAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<ApiResponse<List<ClassSectionDto>>> GetClassSectionsAsync(Guid classId, CancellationToken cancellationToken = default);
     Task<ApiResponse<ClassSectionDto>> CreateClassSectionAsync(CreateClassSectionDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<bool>> DeleteClassSectionAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<ApiResponse<List<SubjectDto>>> GetSubjectsAsync(CancellationToken cancellationToken = default);
     Task<ApiResponse<SubjectDto>> CreateSubjectAsync(CreateSubjectDto dto, CancellationToken cancellationToken = default);
