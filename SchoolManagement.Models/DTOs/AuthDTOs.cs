@@ -48,20 +48,31 @@ public class RegisterTenantRequestDto
     public Guid? SelectedPlanId { get; set; }
 }
 
+public enum ForgotPasswordMethod
+{
+    Email = 1,
+    Mobile = 2
+}
+
 public class ForgotPasswordRequestDto
 {
-    public string Email { get; set; } = string.Empty;
+    public string Identifier { get; set; } = string.Empty;
+    public string? Email { get; set; } // Backward compatibility
+    public ForgotPasswordMethod Method { get; set; } = ForgotPasswordMethod.Email;
 }
 
 public class ForgotPasswordResponseDto
 {
     public string Message { get; set; } = string.Empty;
     public string? ResetToken { get; set; }
+    public string? MaskedDestination { get; set; }
+    public string? ResolvedEmail { get; set; }
 }
 
 public class ResetPasswordRequestDto
 {
-    public string Email { get; set; } = string.Empty;
+    public string Identifier { get; set; } = string.Empty;
+    public string? Email { get; set; } // Backward compatibility
     public string Token { get; set; } = string.Empty;
     public string NewPassword { get; set; } = string.Empty;
 }
