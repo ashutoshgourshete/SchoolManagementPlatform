@@ -71,6 +71,13 @@ public class AssignFeeDto
     public DateTime? EffectiveTo { get; set; }
 }
 
+public class AssignFeeClassDto
+{
+    public Guid ClassSectionId { get; set; }
+    public Guid FeeStructureId { get; set; }
+    public decimal DiscountPercentage { get; set; } = 0m;
+}
+
 public class StudentInvoiceDto
 {
     public Guid Id { get; set; }

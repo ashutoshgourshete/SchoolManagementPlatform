@@ -40,7 +40,7 @@ public class FeeManagementService : IFeeManagementService
             {
                 Id = f.Id,
                 AcademicYearId = f.AcademicYearId,
-                AcademicYearName = f.AcademicYear.Name,
+                AcademicYearName = f.AcademicYear != null ? f.AcademicYear.Name : "Current Academic Year",
                 ClassId = f.ClassId,
                 ClassName = f.Class != null ? f.Class.Name : null,
                 ProgramId = f.ProgramId,
@@ -64,6 +64,26 @@ public class FeeManagementService : IFeeManagementService
 
     public async Task<ApiResponse<FeeStructureDto>> CreateFeeStructureAsync(CreateFeeStructureDto dto, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(dto.Name))
+        {
+            return ApiResponse<FeeStructureDto>.Fail("Fee structure name is required.");
+        }
+
+        if (dto.Items == null || !dto.Items.Any())
+        {
+            return ApiResponse<FeeStructureDto>.Fail("At least one fee component item is required.");
+        }
+
+        if (dto.AcademicYearId == Guid.Empty)
+        {
+            var currentYear = await _context.AcademicYears.FirstOrDefaultAsync(y => y.IsCurrent && !y.IsDeleted, cancellationToken)
+                ?? await _context.AcademicYears.FirstOrDefaultAsync(y => !y.IsDeleted, cancellationToken);
+            if (currentYear != null)
+            {
+                dto.AcademicYearId = currentYear.Id;
+            }
+        }
+
         var total = dto.Items.Sum(i => i.Amount);
 
         var structure = new FeeStructure
@@ -71,7 +91,7 @@ public class FeeManagementService : IFeeManagementService
             AcademicYearId = dto.AcademicYearId,
             ClassId = dto.ClassId,
             ProgramId = dto.ProgramId,
-            Name = dto.Name,
+            Name = dto.Name.Trim(),
             BillingCycle = dto.BillingCycle,
             TotalAmount = total,
             IsActive = true
@@ -81,7 +101,7 @@ public class FeeManagementService : IFeeManagementService
         {
             structure.Items.Add(new FeeStructureItem
             {
-                Name = item.Name,
+                Name = item.Name.Trim(),
                 Amount = item.Amount,
                 IsOptional = item.IsOptional
             });
@@ -90,10 +110,78 @@ public class FeeManagementService : IFeeManagementService
         await _context.FeeStructures.AddAsync(structure, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return (await GetFeeStructuresAsync(dto.AcademicYearId, cancellationToken))
-            .Data!.First(s => s.Id == structure.Id) is { } created
-            ? ApiResponse<FeeStructureDto>.Ok(created, "Fee structure created successfully")
-            : ApiResponse<FeeStructureDto>.Fail("Failed to retrieve created structure");
+        var allStructures = await GetFeeStructuresAsync(null, cancellationToken);
+        var created = allStructures.Data?.FirstOrDefault(s => s.Id == structure.Id);
+        if (created != null)
+        {
+            return ApiResponse<FeeStructureDto>.Ok(created, "Fee structure created successfully");
+        }
+
+        return ApiResponse<FeeStructureDto>.Ok(new FeeStructureDto
+        {
+            Id = structure.Id,
+            AcademicYearId = structure.AcademicYearId,
+            Name = structure.Name,
+            ClassId = structure.ClassId,
+            BillingCycle = structure.BillingCycle,
+            TotalAmount = structure.TotalAmount,
+            IsActive = structure.IsActive,
+            Items = structure.Items.Select(i => new FeeStructureItemDto
+            {
+                Id = i.Id,
+                Name = i.Name,
+                Amount = i.Amount,
+                IsOptional = i.IsOptional
+            }).ToList()
+        }, "Fee structure created successfully");
+    }
+
+    public async Task<ApiResponse<bool>> DeleteFeeStructureAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var structure = await _context.FeeStructures.FindAsync(new object[] { id }, cancellationToken);
+        if (structure == null) return ApiResponse<bool>.Fail("Fee structure not found");
+
+        structure.IsDeleted = true;
+        await _context.SaveChangesAsync(cancellationToken);
+        return ApiResponse<bool>.Ok(true, "Fee structure removed successfully");
+    }
+
+    public async Task<ApiResponse<int>> AssignFeeToClassSectionAsync(Guid classSectionId, Guid feeStructureId, decimal discountPercentage = 0, CancellationToken cancellationToken = default)
+    {
+        var structure = await _context.FeeStructures.FindAsync(new object[] { feeStructureId }, cancellationToken);
+        if (structure == null) return ApiResponse<int>.Fail("Fee structure not found");
+
+        var students = await _context.Students
+            .Where(s => s.IsActive && !s.IsDeleted && s.Enrollments.Any(e => e.ClassSectionId == classSectionId && e.IsActive && !e.IsDeleted))
+            .ToListAsync(cancellationToken);
+
+        if (!students.Any()) return ApiResponse<int>.Fail("No active students found in the selected class section.");
+
+        var count = 0;
+        foreach (var student in students)
+        {
+            var existing = await _context.StudentFeeAssignments
+                .Where(sfa => sfa.StudentId == student.Id && sfa.FeeStructureId == feeStructureId && sfa.IsActive)
+                .ToListAsync(cancellationToken);
+
+            foreach (var ex in existing) { ex.IsActive = false; }
+
+            var discountAmount = discountPercentage > 0 ? (structure.TotalAmount * (discountPercentage / 100m)) : 0m;
+
+            await _context.StudentFeeAssignments.AddAsync(new StudentFeeAssignment
+            {
+                StudentId = student.Id,
+                FeeStructureId = feeStructureId,
+                DiscountPercentage = discountPercentage,
+                DiscountAmount = discountAmount,
+                EffectiveFrom = DateTime.UtcNow,
+                IsActive = true
+            }, cancellationToken);
+            count++;
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+        return ApiResponse<int>.Ok(count, $"Fee structure assigned successfully to {count} students in this class section.");
     }
 
     public async Task<ApiResponse<StudentFeeAssignmentDto>> AssignFeeToStudentAsync(AssignFeeDto dto, CancellationToken cancellationToken = default)

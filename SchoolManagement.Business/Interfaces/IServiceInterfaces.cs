@@ -86,7 +86,9 @@ public interface IFeeManagementService
 {
     Task<ApiResponse<List<FeeStructureDto>>> GetFeeStructuresAsync(Guid? academicYearId = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<FeeStructureDto>> CreateFeeStructureAsync(CreateFeeStructureDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<bool>> DeleteFeeStructureAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ApiResponse<StudentFeeAssignmentDto>> AssignFeeToStudentAsync(AssignFeeDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<int>> AssignFeeToClassSectionAsync(Guid classSectionId, Guid feeStructureId, decimal discountPercentage = 0, CancellationToken cancellationToken = default);
 
     Task<ApiResponse<PagedResult<StudentInvoiceDto>>> GetInvoicesAsync(PaginationFilter filter, Guid? studentId = null, InvoiceStatus? status = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<StudentInvoiceDto>> GetInvoiceByIdAsync(Guid id, CancellationToken cancellationToken = default);

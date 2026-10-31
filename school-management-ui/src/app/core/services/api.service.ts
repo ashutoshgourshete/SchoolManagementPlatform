@@ -194,8 +194,16 @@ export class ApiService {
     return this.http.post<ApiResponse<FeeStructure>>(`${this.baseUrl}/fees/structures`, payload);
   }
 
+  deleteFeeStructure(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/fees/structures/${id}`);
+  }
+
   assignFee(payload: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/fees/assign`, payload);
+  }
+
+  assignFeeToClass(payload: { classSectionId: string; feeStructureId: string; discountPercentage?: number }): Observable<ApiResponse<number>> {
+    return this.http.post<ApiResponse<number>>(`${this.baseUrl}/fees/assign-class`, payload);
   }
 
   getInvoices(pageIndex = 1, pageSize = 20, search?: string, studentId?: string): Observable<ApiResponse<PagedResult<StudentInvoice>>> {
