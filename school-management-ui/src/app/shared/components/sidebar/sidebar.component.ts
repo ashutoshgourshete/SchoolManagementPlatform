@@ -10,7 +10,11 @@ import { AuthService } from '../../../core/services/auth.service';
   template: `
     <aside class="sidebar">
       <div class="sidebar-brand">
-        <div class="brand-logo">🎓</div>
+        @if (getLogo()) {
+          <img [src]="getLogo()" alt="Logo" style="width: 38px; height: 38px; object-fit: contain; border-radius: 10px; background: white; padding: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" />
+        } @else {
+          <div class="brand-logo">🎓</div>
+        }
         <div>
           <div class="brand-title">EduManage Cloud</div>
           <div class="brand-subtitle">{{ authService.tenantName() }}</div>
@@ -87,67 +91,95 @@ import { AuthService } from '../../../core/services/auth.service';
       </nav>
 
       <div class="sidebar-footer">
-        <div class="text-xs text-slate-400">v1.0.0 • Multi-Tenant SaaS</div>
+        <div class="text-xs" style="color: #64748B; font-weight: 600;">v1.0.1 • Multi-Tenant SaaS</div>
       </div>
     </aside>
   `,
   styles: [`
+    :host {
+      display: block;
+      height: 100vh;
+      flex-shrink: 0;
+    }
+    .sidebar {
+      width: 255px;
+      height: 100vh;
+      background: linear-gradient(180deg, #0F172A 0%, #172033 100%);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      color: #FFFFFF;
+      box-shadow: 2px 0 16px rgba(0, 0, 0, 0.08);
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
     .sidebar-brand {
-      padding: 1.5rem;
+      padding: 1.25rem 1.5rem;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      border-bottom: 1px solid #1e293b;
+      gap: 0.85rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
     .brand-logo {
-      font-size: 1.75rem;
+      font-size: 1.85rem;
     }
     .brand-title {
-      font-size: 1.125rem;
-      font-weight: 700;
-      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.2px;
     }
     .brand-subtitle {
-      font-size: 0.75rem;
-      color: #94a3b8;
+      font-size: 0.725rem;
+      font-weight: 600;
+      color: #94A3B8;
+      margin-top: 1px;
     }
     .sidebar-nav {
       flex: 1;
-      padding: 1rem 0.75rem;
+      padding: 1.1rem 0.85rem;
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.3rem;
     }
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.625rem 0.875rem;
-      color: #cbd5e1;
+      gap: 0.8rem;
+      padding: 0.65rem 0.95rem;
+      color: #94A3B8;
       text-decoration: none;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       font-weight: 500;
-      border-radius: 8px;
+      border-radius: 10px;
       transition: all 0.15s ease-in-out;
     }
     .nav-item:hover {
-      background-color: #1e293b;
-      color: #fff;
+      background-color: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+      transform: translateX(2px);
     }
     .nav-item.active {
-      background-color: var(--primary);
-      color: #fff;
-      font-weight: 600;
+      background: linear-gradient(135deg, #1E5BF6 0%, #2563EB 100%);
+      color: #FFFFFF;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(30, 91, 246, 0.35);
     }
     .nav-icon {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
     }
     .sidebar-footer {
       padding: 1rem 1.5rem;
-      border-top: 1px solid #1e293b;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
   `]
 })
 export class SidebarComponent {
   constructor(public authService: AuthService) {}
+
+  getLogo(): string | null {
+    return localStorage.getItem('institution_custom_logo') || null;
+  }
 }

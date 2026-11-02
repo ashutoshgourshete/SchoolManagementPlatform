@@ -36,22 +36,26 @@ import {
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div class="flex items-center gap-4">
             <label class="text-xs font-bold text-slate-600 uppercase">View Mode:</label>
-            <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
+            <div style="display: inline-flex; background: #F1F5F9; padding: 4px; border-radius: 9999px; border: 1px solid #CBD5E1; gap: 4px;">
               <button 
+                type="button"
                 (click)="switchViewMode('class')" 
-                [class.bg-white]="viewMode === 'class'"
-                [class.shadow-sm]="viewMode === 'class'"
-                [class.font-bold]="viewMode === 'class'"
-                class="px-3 py-1.5 rounded-md transition-all text-slate-700">
-                Class Section Grid
+                [style.background]="viewMode === 'class' ? '#1E5BF6' : 'transparent'"
+                [style.color]="viewMode === 'class' ? '#FFFFFF' : '#475569'"
+                [style.font-weight]="viewMode === 'class' ? '700' : '600'"
+                [style.box-shadow]="viewMode === 'class' ? '0 4px 12px rgba(30, 91, 246, 0.3)' : 'none'"
+                style="border: none; padding: 6px 18px; border-radius: 9999px; font-size: 12px; cursor: pointer; transition: all 0.2s;">
+                🏫 Class Section Grid
               </button>
               <button 
+                type="button"
                 (click)="switchViewMode('teacher')" 
-                [class.bg-white]="viewMode === 'teacher'"
-                [class.shadow-sm]="viewMode === 'teacher'"
-                [class.font-bold]="viewMode === 'teacher'"
-                class="px-3 py-1.5 rounded-md transition-all text-slate-700">
-                Teacher Schedule
+                [style.background]="viewMode === 'teacher' ? '#1E5BF6' : 'transparent'"
+                [style.color]="viewMode === 'teacher' ? '#FFFFFF' : '#475569'"
+                [style.font-weight]="viewMode === 'teacher' ? '700' : '600'"
+                [style.box-shadow]="viewMode === 'teacher' ? '0 4px 12px rgba(30, 91, 246, 0.3)' : 'none'"
+                style="border: none; padding: 6px 18px; border-radius: 9999px; font-size: 12px; cursor: pointer; transition: all 0.2s;">
+                👨‍🏫 Teacher Schedule
               </button>
             </div>
           </div>
@@ -69,7 +73,7 @@ import {
               <select [(ngModel)]="selectedSectionId" (change)="loadClassTimetable()" [disabled]="!availableSections.length" class="form-control text-xs w-48">
                 <option value="">Select Section...</option>
                 @for (s of availableSections; track s.id) {
-                  <option [value]="s.id">Section {{ s.name }} (Room: {{ s.roomNumber || 'N/A' }})</option>
+                  <option [value]="s.id">{{ formatSecName(s.name) }} (Room: {{ s.roomNumber || 'N/A' }})</option>
                 }
               </select>
             </div>
@@ -420,6 +424,11 @@ export class TimetablesComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  openScheduleModalForDay(day: number): void {
+    this.newSlot.dayOfWeek = day;
+    this.openScheduleModal();
   }
 
   openScheduleModal(): void {

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "color": {
+    "brand": {
+      "primary": { "value": "#4f46e5", "type": "color", "description": "Indigo 600 - Main Brand Color" },
+      "primary-hover": { "value": "#4338ca", "type": "color" },
+      "primary-light": { "value": "#eef2ff", "type": "color" },
+      "secondary": { "value": "#0ea5e9", "type": "color", "description": "Sky 500 - Secondary Accent" }
+    },
+    "semantic": {
+      "success": { "value": "#10b981", "type": "color" },
+      "success-light": { "value": "#ecfdf5", "type": "color" },
+      "warning": { "value": "#f59e0b", "type": "color" },
+      "warning-light": { "value": "#fffbeb", "type": "color" },
+      "danger": { "value": "#ef4444", "type": "color" },
+      "danger-light": { "value": "#fef2f2", "type": "color" },
+      "info": { "value": "#3b82f6", "type": "color" }
+    },
+    "neutral": {
+      "bg-app": { "value": "#f8fafc", "type": "color" },
+      "card-surface": { "value": "#ffffff", "type": "color" },
+      "sidebar-dark": { "value": "#0f172a", "type": "color" },
+      "border": { "value": "#e2e8f0", "type": "color" },
+      "text-primary": { "value": "#0f172a", "type": "color" },
+      "text-muted": { "value": "#64748b", "type": "color" }
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "sans": { "value": "Plus Jakarta Sans, Inter, system-ui, sans-serif", "type": "fontFamily" }
+    },
+    "fontSize": {
+      "xs": { "value": "12px", "type": "dimension" },
+      "sm": { "value": "14px", "type": "dimension" },
+      "base": { "value": "16px", "type": "dimension" },
+      "lg": { "value": "18px", "type": "dimension" },
+      "xl": { "value": "20px", "type": "dimension" },
+      "2xl": { "value": "24px", "type": "dimension" },
+      "3xl": { "value": "30px", "type": "dimension" }
+    }
+  },
+  "borderRadius": {
+    "sm": { "value": "6px", "type": "dimension" },
+    "md": { "value": "8px", "type": "dimension" },
+    "lg": { "value": "12px", "type": "dimension" },
+    "xl": { "value": "16px", "type": "dimension" },
+    "full": { "value": "9999px", "type": "dimension" }
+  },
+  "boxShadow": {
+    "sm": { "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)", "type": "shadow" },
+    "card": { "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)", "type": "shadow" },
+    "dropdown": { "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)", "type": "shadow" }
+  }
+}

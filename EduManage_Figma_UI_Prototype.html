@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduManage SaaS | Figma UI Design System & Prototype</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f1f5f9; }
+    .figma-canvas { background: radial-gradient(#1e293b 1px, transparent 1px); background-size: 20px 20px; }
+    .code-font { font-family: 'JetBrains Mono', monospace; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .device-shadow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Figma-Style Toolbar -->
+  <header class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2">
+        <svg class="w-7 h-7 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        <span class="font-bold text-lg text-white">EduManage</span>
+        <span class="bg-indigo-900/60 text-indigo-300 text-xs px-2.5 py-0.5 rounded-full font-medium border border-indigo-700/50">Figma UI Kit v2.4</span>
+      </div>
+      <div class="h-5 w-px bg-slate-700"></div>
+      <div class="text-xs text-slate-400 flex items-center space-x-1">
+        <span>Frame:</span>
+        <span id="currentFrameLabel" class="text-white font-semibold">1. Design System & Tokens</span>
+      </div>
+    </div>
+
+    <!-- Screen Switcher Tabs -->
+    <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+      <button onclick="switchScreen('design-system')" id="btn-design-system" class="px-3.5 py-1.5 rounded-lg font-medium transition-all bg-indigo-600 text-white shadow-sm">
+        🎨 Design Tokens
+      </button>
+      <button onclick="switchScreen('platform-admin')" id="btn-platform-admin" class="px-3.5 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white">
+        🏢 SuperAdmin SaaS
+      </button>
+      <button onclick="switchScreen('school-dashboard')" id="btn-school-dashboard" class="px-3.5 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white">
+        🏫 School Dashboard
+      </button>
+      <button onclick="switchScreen('fees-ledger')" id="btn-fees-ledger" class="px-3.5 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white">
+        💳 Fees & Invoices
+      </button>
+      <button onclick="switchScreen('mobile-view')" id="btn-mobile-view" class="px-3.5 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white">
+        📱 Mobile Portal
+      </button>
+    </div>
+
+    <!-- Actions & Figma Export -->
+    <div class="flex items-center space-x-3">
+      <button onclick="toggleModal('figmaImportModal')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center space-x-2 transition-all shadow-lg shadow-emerald-900/30">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2a5 5 0 0 1 5 5v2h-5a5 5 0 0 1 0-7zm0 14a5 5 0 0 1 5-5H12v5zm-7-5a5 5 0 0 1 5-5h2v5a5 5 0 0 1-7 0zm2 7a5 5 0 0 0 5 5v-5H7zm0-7a5 5 0 0 1 5-5v5H7z"/>
+        </svg>
+        <span>Import into Figma</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Figma Canvas Workspace -->
+  <main class="flex-1 figma-canvas p-8 flex items-center justify-center overflow-auto">
+
+    <!-- ========================================== -->
+    <!-- SCREEN 1: DESIGN SYSTEM & TOKENS -->
+    <!-- ========================================== -->
+    <div id="screen-design-system" class="w-full max-w-6xl space-y-8">
+      
+      <!-- Header Banner -->
+      <div class="bg-slate-900/80 backdrop-blur border border-slate-800 p-6 rounded-2xl flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-white">EduManage Design System & Component Library</h2>
+          <p class="text-slate-400 text-sm mt-1">Foundational tokens, accessible color contrasts (WCAG AAA), and reusable UI primitives.</p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <span class="text-xs bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-slate-300">Base Unit: 4px Grid</span>
+          <span class="text-xs bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-slate-300">Typography: Plus Jakarta Sans</span>
+        </div>
+      </div>
+
+      <!-- Color Swatches -->
+      <div class="bg-slate-900/80 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400">Color Palette & Token Variables</h3>
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+          <div class="space-y-1.5">
+            <div class="h-20 bg-indigo-600 rounded-xl shadow-inner flex items-end p-2.5">
+              <span class="text-white text-xs font-semibold">Primary 600</span>
+            </div>
+            <div class="text-[11px] code-font text-slate-400">#4F46E5</div>
+          </div>
+          <div class="space-y-1.5">
+            <div class="h-20 bg-sky-500 rounded-xl shadow-inner flex items-end p-2.5">
+              <span class="text-white text-xs font-semibold">Secondary 500</span>
+            </div>
+            <div class="text-[11px] code-font text-slate-400">#0EA5E9</div>
+          </div>
+          <div class="space-y-1.5">
+            <div class="h-20 bg-emerald-500 rounded-xl shadow-inner flex items-end p-2.5">
+              <span class="text-white text-xs font-semibold">Success 500</span>
+            </div>
+            <div class="text-[11px] code-font text-slate-400">#10B981</div>
+          </div>
+          <div class="space-y-1.5">
+            <div class="h-20 bg-amber-500 rounded-xl shadow-inner flex items-end p-2.5">
+              <span class="text-white text-xs font-semibold">Warning 500</span>
+            </div>
+            <div class="text-[11px] code-font text-slate-400">#F59E0B</div>
+          </div>
+          <div class="space-y-1.5">
+            <div class="h-20 bg-rose-500 rounded-xl shadow-inner flex items-end p-2.5">
+              <span class="text-white text-xs font-semibold">Danger 500</span>
+            </div>
+            <div class="text-[11px] code-font text-slate-400">#EF4444</div>
+          </div>
+          <div class="space-y-1.5">
+            <div class="h-20 bg-slate-900 border border-slate-700 rounded-xl shadow-inner flex items-end p-2.5">
+              <span class="text-white text-xs font-semibold">Slate 900 (Nav)</span>
+            </div>
+            <div class="text-[11px] code-font text-slate-400">#0F172A</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UI Components Showcase -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Buttons & Inputs -->
+        <div class="bg-slate-900/80 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-5">
+          <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400">Interactive Controls</h3>
+          
+          <div class="space-y-3">
+            <label class="text-xs text-slate-400">Button Variants</label>
+            <div class="flex flex-wrap gap-2.5">
+              <button class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg">Primary Button</button>
+              <button class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold px-4 py-2 rounded-lg">Secondary Outline</button>
+              <button class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg">Success Action</button>
+              <button class="bg-rose-600/20 text-rose-400 border border-rose-800 text-xs font-semibold px-4 py-2 rounded-lg">Destructive</button>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs text-slate-400">Form Inputs & Selectors</label>
+            <div class="grid grid-cols-2 gap-3">
+              <input type="text" placeholder="Search students..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+              <select class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                <option>Grade 10 - Section A</option>
+                <option>Grade 11 - Science</option>
+                <option>B.Tech Semester 4</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badges & Status Chips -->
+        <div class="bg-slate-900/80 backdrop-blur border border-slate-800 p-6 rounded-2xl space-y-5">
+          <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400">Status Badges & Indicators</h3>
+          
+          <div class="space-y-3">
+            <label class="text-xs text-slate-400">Invoice & Fee States</label>
+            <div class="flex flex-wrap gap-2">
+              <span class="bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 text-xs font-medium px-2.5 py-1 rounded-full flex items-center space-x-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Paid</span>
+              </span>
+              <span class="bg-amber-950/60 text-amber-400 border border-amber-800/60 text-xs font-medium px-2.5 py-1 rounded-full flex items-center space-x-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span>Partial Paid</span>
+              </span>
+              <span class="bg-rose-950/60 text-rose-400 border border-rose-800/60 text-xs font-medium px-2.5 py-1 rounded-full flex items-center space-x-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                <span>Overdue (3 Days)</span>
+              </span>
+              <span class="bg-slate-800 text-slate-300 border border-slate-700 text-xs font-medium px-2.5 py-1 rounded-full">Draft</span>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <label class="text-xs text-slate-400">Attendance Statuses</label>
+            <div class="flex flex-wrap gap-2">
+              <span class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-md">P (Present)</span>
+              <span class="bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-md">A (Absent)</span>
+              <span class="bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-md">L (Late)</span>
+              <span class="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-md">E (Excused)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 2: SAAS SUPERADMIN DASHBOARD -->
+    <!-- ========================================== -->
+    <div id="screen-platform-admin" class="hidden w-full max-w-6xl bg-white rounded-2xl overflow-hidden shadow-2xl text-slate-800 border border-slate-200">
+      
+      <!-- Top Bar -->
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold">EM</div>
+          <div>
+            <h3 class="font-bold text-sm">EduManage SaaS Core</h3>
+            <span class="text-[11px] text-slate-400">Global Platform SuperAdmin</span>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-2.5 py-1 rounded-full">● Cluster Healthy (US-East)</span>
+          <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold">PA</div>
+        </div>
+      </div>
+
+      <!-- Body Content -->
+      <div class="p-8 space-y-6 bg-slate-50">
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-medium text-slate-500 uppercase">Monthly Recurring Rev</span>
+            <div class="text-2xl font-extrabold text-slate-900 mt-1">$48,250</div>
+            <span class="text-xs text-emerald-600 font-semibold flex items-center mt-2">↑ +14.2% from last month</span>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-medium text-slate-500 uppercase">Active School Tenants</span>
+            <div class="text-2xl font-extrabold text-slate-900 mt-1">142</div>
+            <span class="text-xs text-emerald-600 font-semibold flex items-center mt-2">↑ 8 new this week</span>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-medium text-slate-500 uppercase">Managed Students</span>
+            <div class="text-2xl font-extrabold text-slate-900 mt-1">86,400</div>
+            <span class="text-xs text-slate-500 mt-2">Across K-12 & Colleges</span>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-medium text-slate-500 uppercase">Gross Platform Margin</span>
+            <div class="text-2xl font-extrabold text-indigo-600 mt-1">86.4%</div>
+            <span class="text-xs text-slate-500 mt-2">Hosting & SMS cost deducted</span>
+          </div>
+        </div>
+
+        <!-- Tenants Table -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h4 class="font-bold text-slate-900 text-sm">Registered Educational Institutions</h4>
+            <button class="bg-indigo-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">+ Provision New Tenant</button>
+          </div>
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-medium border-b border-slate-200">
+              <tr>
+                <th class="px-6 py-3">Institution</th>
+                <th class="px-6 py-3">Category</th>
+                <th class="px-6 py-3">Subscription Plan</th>
+                <th class="px-6 py-3">Students</th>
+                <th class="px-6 py-3">MRR</th>
+                <th class="px-6 py-3">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="px-6 py-3.5 font-semibold text-slate-900">Greenwood High International</td>
+                <td class="px-6 py-3.5">K-12 School</td>
+                <td class="px-6 py-3.5"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">Pro Annual</span></td>
+                <td class="px-6 py-3.5">1,240</td>
+                <td class="px-6 py-3.5 font-medium">$499 / mo</td>
+                <td class="px-6 py-3.5"><span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[11px] font-semibold">Active</span></td>
+              </tr>
+              <tr>
+                <td class="px-6 py-3.5 font-semibold text-slate-900">St. Xavier Engineering College</td>
+                <td class="px-6 py-3.5">Higher Education</td>
+                <td class="px-6 py-3.5"><span class="bg-purple-50 text-purple-700 px-2 py-0.5 rounded font-medium">Enterprise Custom</span></td>
+                <td class="px-6 py-3.5">4,850</td>
+                <td class="px-6 py-3.5 font-medium">$1,850 / mo</td>
+                <td class="px-6 py-3.5"><span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[11px] font-semibold">Active</span></td>
+              </tr>
+              <tr>
+                <td class="px-6 py-3.5 font-semibold text-slate-900">Beacon Hill Academy</td>
+                <td class="px-6 py-3.5">K-12 School</td>
+                <td class="px-6 py-3.5"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-medium">Starter</span></td>
+                <td class="px-6 py-3.5">380</td>
+                <td class="px-6 py-3.5 font-medium">$149 / mo</td>
+                <td class="px-6 py-3.5"><span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full text-[11px] font-semibold">Trial (4 Days)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 3: INSTITUTION ADMIN DASHBOARD -->
+    <!-- ========================================== -->
+    <div id="screen-school-dashboard" class="hidden w-full max-w-6xl bg-white rounded-2xl overflow-hidden shadow-2xl text-slate-800 border border-slate-200">
+      
+      <!-- Top App Bar -->
+      <div class="bg-indigo-600 text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center font-bold">GW</div>
+          <div>
+            <h3 class="font-bold text-sm">Greenwood High School</h3>
+            <span class="text-[11px] text-indigo-100">Academic Year: 2026-2027</span>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3 text-xs">
+          <button class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg font-medium">Take Attendance</button>
+          <button class="bg-white text-indigo-700 px-3 py-1.5 rounded-lg font-bold shadow-sm">+ Admit Student</button>
+        </div>
+      </div>
+
+      <!-- Dashboard Cards -->
+      <div class="p-8 space-y-6 bg-slate-50">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Total Enrolled</span>
+            <div class="text-2xl font-bold text-slate-900 mt-1">1,240</div>
+            <div class="text-xs text-slate-500 mt-2">640 Boys | 600 Girls</div>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Today's Attendance</span>
+            <div class="text-2xl font-bold text-emerald-600 mt-1">94.8%</div>
+            <div class="text-xs text-emerald-700 font-medium mt-2">1,176 Present | 64 Absent</div>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Term Fee Collection</span>
+            <div class="text-2xl font-bold text-indigo-600 mt-1">₹42.8 Lakhs</div>
+            <div class="text-xs text-slate-500 mt-2">82% of ₹52.2L target</div>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Teaching Staff</span>
+            <div class="text-2xl font-bold text-slate-900 mt-1">78 Teachers</div>
+            <div class="text-xs text-slate-500 mt-2">100% on duty today</div>
+          </div>
+        </div>
+
+        <!-- Class Breakdown & Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="md:col-span-2 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <h4 class="font-bold text-slate-900 text-sm mb-4">Class-wise Attendance & Strength</h4>
+            <div class="space-y-3 text-xs">
+              <div>
+                <div class="flex justify-between mb-1 font-semibold">
+                  <span>Grade 10 - Science & Math (120 Students)</span>
+                  <span class="text-emerald-600">96% Present</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                  <div class="bg-emerald-500 h-2 rounded-full" style="width: 96%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1 font-semibold">
+                  <span>Grade 9 - All Sections (140 Students)</span>
+                  <span class="text-emerald-600">93% Present</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                  <div class="bg-emerald-500 h-2 rounded-full" style="width: 93%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1 font-semibold">
+                  <span>Grade 8 - All Sections (135 Students)</span>
+                  <span class="text-emerald-600">95% Present</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                  <div class="bg-emerald-500 h-2 rounded-full" style="width: 95%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h4 class="font-bold text-slate-900 text-sm">Urgent School Alerts</h4>
+            <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs space-y-1">
+              <span class="font-bold text-amber-800">Fee Due Reminder Sent</span>
+              <p class="text-amber-700">Automated SMS/Email sent to 48 parents with 2nd Term dues.</p>
+            </div>
+            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs space-y-1">
+              <span class="font-bold text-blue-800">Mid-Term Examination</span>
+              <p class="text-blue-700">Exam schedule uploaded for Grade 10 & 12.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 4: FEES & INVOICE MANAGEMENT -->
+    <!-- ========================================== -->
+    <div id="screen-fees-ledger" class="hidden w-full max-w-6xl bg-white rounded-2xl overflow-hidden shadow-2xl text-slate-800 border border-slate-200">
+      
+      <!-- Top Bar -->
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-sm">Fee Management & Billing Ledger</h3>
+          <span class="text-[11px] text-slate-400">Greenwood High School | Accounting Module</span>
+        </div>
+        <div class="flex items-center space-x-3 text-xs">
+          <button class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg font-medium border border-slate-700">Export Excel</button>
+          <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-lg font-bold">+ Generate Invoices</button>
+        </div>
+      </div>
+
+      <!-- Ledger Content -->
+      <div class="p-8 space-y-5 bg-slate-50">
+        <!-- Filter Bar -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-wrap gap-3 items-center justify-between text-xs">
+          <div class="flex items-center space-x-3">
+            <input type="text" placeholder="Search by student name or roll..." class="border border-slate-200 rounded-lg px-3 py-1.5 text-xs w-64 focus:outline-none focus:border-indigo-500">
+            <select class="border border-slate-200 rounded-lg px-3 py-1.5 text-xs">
+              <option>All Classes</option>
+              <option>Grade 10</option>
+              <option>Grade 11</option>
+            </select>
+            <select class="border border-slate-200 rounded-lg px-3 py-1.5 text-xs">
+              <option>All Statuses</option>
+              <option>Paid</option>
+              <option>Pending</option>
+              <option>Overdue</option>
+            </select>
+          </div>
+          <div class="text-xs text-slate-500">
+            Showing <span class="font-bold text-slate-800">4</span> of 1,240 records
+          </div>
+        </div>
+
+        <!-- Invoices Table -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-xs">
+          <table class="w-full text-left">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-200">
+              <tr>
+                <th class="px-6 py-3">Invoice #</th>
+                <th class="px-6 py-3">Student Name</th>
+                <th class="px-6 py-3">Class</th>
+                <th class="px-6 py-3">Total Due</th>
+                <th class="px-6 py-3">Paid Amount</th>
+                <th class="px-6 py-3">Due Date</th>
+                <th class="px-6 py-3">Status</th>
+                <th class="px-6 py-3">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="px-6 py-3.5 font-mono font-medium text-slate-900">INV-2026-0081</td>
+                <td class="px-6 py-3.5 font-bold text-slate-900">Aarav Sharma</td>
+                <td class="px-6 py-3.5">10-A</td>
+                <td class="px-6 py-3.5 font-medium">₹25,000</td>
+                <td class="px-6 py-3.5 text-emerald-600 font-semibold">₹25,000</td>
+                <td class="px-6 py-3.5">15 Nov 2026</td>
+                <td class="px-6 py-3.5"><span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Paid</span></td>
+                <td class="px-6 py-3.5"><button class="text-indigo-600 hover:underline font-semibold">Receipt PDF</button></td>
+              </tr>
+              <tr>
+                <td class="px-6 py-3.5 font-mono font-medium text-slate-900">INV-2026-0082</td>
+                <td class="px-6 py-3.5 font-bold text-slate-900">Diya Patel</td>
+                <td class="px-6 py-3.5">10-B</td>
+                <td class="px-6 py-3.5 font-medium">₹28,500</td>
+                <td class="px-6 py-3.5 text-amber-600 font-semibold">₹15,000</td>
+                <td class="px-6 py-3.5">15 Nov 2026</td>
+                <td class="px-6 py-3.5"><span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-semibold">Partial</span></td>
+                <td class="px-6 py-3.5"><button class="text-indigo-600 hover:underline font-semibold">Collect Due</button></td>
+              </tr>
+              <tr>
+                <td class="px-6 py-3.5 font-mono font-medium text-slate-900">INV-2026-0083</td>
+                <td class="px-6 py-3.5 font-bold text-slate-900">Rohan Verma</td>
+                <td class="px-6 py-3.5">9-A</td>
+                <td class="px-6 py-3.5 font-medium">₹22,000</td>
+                <td class="px-6 py-3.5 text-slate-400 font-semibold">₹0</td>
+                <td class="px-6 py-3.5 text-rose-600 font-semibold">25 Oct 2026</td>
+                <td class="px-6 py-3.5"><span class="bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full font-semibold">Overdue</span></td>
+                <td class="px-6 py-3.5"><button class="text-indigo-600 hover:underline font-semibold">Send Reminder</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 5: MOBILE APP PORTAL (IPHONE VIEW) -->
+    <!-- ========================================== -->
+    <div id="screen-mobile-view" class="hidden flex justify-center py-6">
+      
+      <!-- iPhone Mockup Device Frame -->
+      <div class="w-[380px] h-[780px] bg-slate-900 rounded-[50px] p-3.5 border-4 border-slate-700 device-shadow relative flex flex-col">
+        
+        <!-- iPhone Notch & Dynamic Island -->
+        <div class="w-28 h-5 bg-black rounded-full mx-auto mb-2 flex items-center justify-center">
+          <div class="w-2.5 h-2.5 rounded-full bg-slate-800 ml-auto mr-2"></div>
+        </div>
+
+        <!-- Phone Screen Content (Parent / Student View) -->
+        <div class="flex-1 bg-slate-50 rounded-[38px] overflow-hidden flex flex-col text-slate-800 relative">
+          
+          <!-- Mobile Header -->
+          <div class="bg-indigo-600 p-5 text-white pt-6">
+            <div class="flex justify-between items-center mb-4">
+              <div>
+                <span class="text-xs text-indigo-200">Welcome Back,</span>
+                <h3 class="font-bold text-base">Aarav Sharma (Gr 10)</h3>
+              </div>
+              <div class="w-9 h-9 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-xs font-bold">AS</div>
+            </div>
+
+            <!-- Attendance Mini Card -->
+            <div class="bg-white/10 backdrop-blur rounded-xl p-3 flex justify-between items-center text-xs">
+              <div>
+                <span class="text-[11px] text-indigo-200 block">Today's Attendance</span>
+                <span class="font-bold text-emerald-300 flex items-center space-x-1 mt-0.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span>Marked Present (08:12 AM)</span>
+                </span>
+              </div>
+              <div class="text-right">
+                <span class="text-[11px] text-indigo-200 block">Term Average</span>
+                <span class="font-bold text-white text-sm">96.4%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Body -->
+          <div class="p-4 space-y-4 overflow-y-auto flex-1 text-xs">
+            
+            <!-- Quick Fee Pay Card -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-slate-900">Term 2 Tuition Fee</span>
+                <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[10px] font-semibold">Due in 5 Days</span>
+              </div>
+              <div class="flex justify-between items-baseline pt-1">
+                <div>
+                  <span class="text-[11px] text-slate-500">Amount to Pay</span>
+                  <div class="text-xl font-extrabold text-slate-900">₹12,500</div>
+                </div>
+                <button class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-xs shadow-md shadow-emerald-600/30">
+                  Pay with UPI / Card
+                </button>
+              </div>
+            </div>
+
+            <!-- Today's Schedule -->
+            <div class="space-y-2">
+              <h4 class="font-bold text-slate-900 text-xs">Today's Timetable</h4>
+              
+              <div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 font-bold flex items-center justify-center text-xs">01</div>
+                  <div>
+                    <h5 class="font-bold text-slate-900 text-xs">Mathematics</h5>
+                    <span class="text-[11px] text-slate-500">Room 204 • Mr. Sharma</span>
+                  </div>
+                </div>
+                <span class="text-[11px] text-slate-500">08:30 - 09:20</span>
+              </div>
+
+              <div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 font-bold flex items-center justify-center text-xs">02</div>
+                  <div>
+                    <h5 class="font-bold text-slate-900 text-xs">Physics Lab</h5>
+                    <span class="text-[11px] text-slate-500">Lab 2 • Mrs. Sen</span>
+                  </div>
+                </div>
+                <span class="text-[11px] text-slate-500">09:30 - 10:20</span>
+              </div>
+            </div>
+
+            <!-- Campus Notice -->
+            <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl space-y-1">
+              <span class="font-bold text-indigo-900 text-xs">Sports Day Trials</span>
+              <p class="text-[11px] text-indigo-700">Athletics team trials will be held tomorrow at 03:30 PM on the main ground.</p>
+            </div>
+          </div>
+
+          <!-- Mobile Bottom Navigation Bar -->
+          <div class="bg-white border-t border-slate-200 px-6 py-3 flex justify-between items-center text-xs text-slate-400">
+            <div class="flex flex-col items-center text-indigo-600 font-bold">
+              <span>🏠</span>
+              <span class="text-[10px]">Home</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <span>📅</span>
+              <span class="text-[10px]">Schedule</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <span>💳</span>
+              <span class="text-[10px]">Fees</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <span>👤</span>
+              <span class="text-[10px]">Profile</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL: HOW TO IMPORT INTO FIGMA IN 1 CLICK -->
+  <!-- ========================================== -->
+  <div id="figmaImportModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-5 text-white">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-2.5">
+          <svg class="w-6 h-6 text-indigo-400" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2a5 5 0 0 1 5 5v2h-5a5 5 0 0 1 0-7zm0 14a5 5 0 0 1 5-5H12v5zm-7-5a5 5 0 0 1 5-5h2v5a5 5 0 0 1-7 0zm2 7a5 5 0 0 0 5 5v-5H7zm0-7a5 5 0 0 1 5-5v5H7z"/>
+          </svg>
+          <h3 class="text-lg font-bold">How to Import this Design into Figma</h3>
+        </div>
+        <button onclick="toggleModal('figmaImportModal')" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <p class="text-slate-300 text-xs leading-relaxed">
+        You can convert this exact prototype into **100% editable Figma layers, auto-layouts, vectors, and typography** using the free Figma Community plugin in seconds:
+      </p>
+
+      <div class="space-y-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800">
+        <div class="flex items-start space-x-3">
+          <span class="bg-indigo-600 text-white font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px]">1</span>
+          <span>Open any file in <strong>Figma</strong> (desktop or browser).</span>
+        </div>
+        <div class="flex items-start space-x-3">
+          <span class="bg-indigo-600 text-white font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px]">2</span>
+          <span>Go to <strong>Plugins &rarr; Search "html.to.design"</strong> (or "Builder.io").</span>
+        </div>
+        <div class="flex items-start space-x-3">
+          <span class="bg-indigo-600 text-white font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px]">3</span>
+          <span>Select <strong>"Import HTML"</strong> and upload or paste the HTML file:</span>
+        </div>
+        <div class="pl-8 code-font text-indigo-300 text-[11px]">
+          EduManage_Figma_UI_Prototype.html
+        </div>
+        <div class="flex items-start space-x-3">
+          <span class="bg-indigo-600 text-white font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px]">4</span>
+          <span>Click <strong>Import</strong>. Figma instantly generates clean auto-layout frames, color styles, and vector components ready for your design team!</span>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end space-x-3 text-xs">
+        <button onclick="toggleModal('figmaImportModal')" class="bg-indigo-600 hover:bg-indigo-500 font-bold px-4 py-2 rounded-lg">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    const screens = {
+      'design-system': { id: 'screen-design-system', label: '1. Design Tokens & Components' },
+      'platform-admin': { id: 'screen-platform-admin', label: '2. SaaS SuperAdmin Platform' },
+      'school-dashboard': { id: 'screen-school-dashboard', label: '3. School / College Admin Dashboard' },
+      'fees-ledger': { id: 'screen-fees-ledger', label: '4. Fee Management & Invoices' },
+      'mobile-view': { id: 'screen-mobile-view', label: '5. Mobile App Portal (iPhone View)' }
+    };
+
+    function switchScreen(screenKey) {
+      Object.keys(screens).forEach(key => {
+        const el = document.getElementById(screens[key].id);
+        const btn = document.getElementById('btn-' + key);
+        if (key === screenKey) {
+          el.classList.remove('hidden');
+          btn.className = 'px-3.5 py-1.5 rounded-lg font-medium transition-all bg-indigo-600 text-white shadow-sm';
+          document.getElementById('currentFrameLabel').innerText = screens[key].label;
+        } else {
+          el.classList.add('hidden');
+          btn.className = 'px-3.5 py-1.5 rounded-lg font-medium transition-all text-slate-400 hover:text-white';
+        }
+      });
+    }
+
+    function toggleModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.toggle('hidden');
+    }
+  </script>
+</body>
+</html>
