@@ -230,8 +230,28 @@ public class AcademicService : IAcademicService
 
     public async Task<ApiResponse<ClassDto>> CreateClassAsync(CreateClassDto dto, CancellationToken cancellationToken = default)
     {
+        Guid targetInstitutionId;
+        if (dto.InstitutionId.HasValue && dto.InstitutionId.Value != Guid.Empty)
+        {
+            targetInstitutionId = dto.InstitutionId.Value;
+        }
+        else if (_currentTenantService.InstitutionId.HasValue)
+        {
+            targetInstitutionId = _currentTenantService.InstitutionId.Value;
+        }
+        else
+        {
+            targetInstitutionId = await _context.Institutions.Where(i => !i.IsDeleted).Select(i => i.Id).FirstOrDefaultAsync(cancellationToken);
+        }
+
+        var institution = await _context.Institutions.IgnoreQueryFilters().FirstOrDefaultAsync(i => i.Id == targetInstitutionId, cancellationToken);
+        var targetTenantId = institution?.TenantId ?? _currentTenantService.TenantId ?? Guid.Empty;
+
         var cls = new Class
         {
+            TenantId = targetTenantId,
+            InstitutionId = targetInstitutionId,
+
             AcademicYearId = dto.AcademicYearId,
             DepartmentId = dto.DepartmentId,
             ProgramId = dto.ProgramId,
@@ -278,12 +298,39 @@ public class AcademicService : IAcademicService
 
     public async Task<ApiResponse<ClassSectionDto>> CreateClassSectionAsync(CreateClassSectionDto dto, CancellationToken cancellationToken = default)
     {
+        var parentClass = await _context.Classes
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(c => c.Id == dto.ClassId && !c.IsDeleted, cancellationToken);
+
+        if (parentClass == null)
+        {
+            return ApiResponse<ClassSectionDto>.Fail("Parent class not found. Please refresh and try again.");
+        }
+
+        var targetTenantId = parentClass.TenantId != Guid.Empty 
+            ? parentClass.TenantId 
+            : (_currentTenantService.TenantId ?? Guid.Empty);
+
+        var targetInstitutionId = parentClass.InstitutionId != Guid.Empty
+            ? parentClass.InstitutionId
+            : (_currentTenantService.InstitutionId ?? Guid.Empty);
+
+        if (targetTenantId == Guid.Empty)
+        {
+            var inst = await _context.Institutions.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(i => i.Id == targetInstitutionId, cancellationToken);
+            if (inst != null) targetTenantId = inst.TenantId;
+        }
+
         var section = new ClassSection
         {
-            ClassId = dto.ClassId,
-            Name = dto.Name,
-            Capacity = dto.Capacity,
-            RoomNumber = dto.RoomNumber,
+            TenantId = targetTenantId,
+            InstitutionId = targetInstitutionId,
+            ClassId = parentClass.Id,
+            Name = dto.Name.Trim(),
+            Capacity = dto.Capacity > 0 ? dto.Capacity : 40,
+            RoomNumber = dto.RoomNumber?.Trim(),
+
             ClassTeacherId = dto.ClassTeacherId
         };
 

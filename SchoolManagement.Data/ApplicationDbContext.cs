@@ -68,6 +68,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
         base.OnModelCreating(builder);
 
+        // Ignore unmapped Tenant.LogoUrl so SQL query doesn't fail if column doesn't exist in DB
+        builder.Entity<Tenant>().Ignore(t => t.LogoUrl);
+
         // Configure Decimal Precisions
         foreach (var property in builder.Model.GetEntityTypes()
                      .SelectMany(t => t.GetProperties())

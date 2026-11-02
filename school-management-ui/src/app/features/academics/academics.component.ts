@@ -45,12 +45,17 @@ import { AcademicYear, ClassModel, Department, Program, Subject } from '../../co
                 <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
                   <div class="flex items-center justify-between mb-2">
                     <span class="font-bold text-slate-900">{{ cls.name }} ({{ cls.code }})</span>
-                    <span class="badge badge-neutral text-xs">{{ cls.sections.length }} Sections</span>
+                    <div class="flex items-center gap-2">
+                      <span class="badge badge-neutral text-xs">{{ cls.sections.length }} Sections</span>
+                      <button (click)="openAddSectionModal(cls)" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 3px 10px; background-color: #1E5BF6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        + Section
+                      </button>
+                    </div>
                   </div>
                   <div class="flex flex-wrap gap-2 mt-2">
                     @for (sec of cls.sections; track sec.id) {
                       <div class="bg-white border border-slate-200 px-3 py-1.5 rounded-md text-xs flex items-center gap-2">
-                        <span class="font-bold text-primary">{{ sec.name }}</span>
+                        <span class="font-bold text-primary">{{ formatSecName(sec.name) }}</span>
                         <span class="text-slate-500">Cap: {{ sec.capacity }}</span>
                         <span class="text-slate-400">({{ sec.roomNumber || 'Room TBD' }})</span>
                       </div>
@@ -256,6 +261,52 @@ import { AcademicYear, ClassModel, Department, Program, Subject } from '../../co
           </div>
         </div>
       }
+
+      <!-- Add Section Modal Popup -->
+      @if (showSectionModal && targetClassForSection) {
+        <div style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(4px);">
+          <div style="background: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 460px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #E2E8F0; padding-bottom: 12px;">
+              <div>
+                <h3 style="font-size: 18px; font-weight: 700; color: #0F172A; margin: 0;">+ Add Section to {{ targetClassForSection.name }}</h3>
+                <p style="font-size: 12px; color: #64748B; margin: 4px 0 0 0;">Create a new division cohort and seat capacity</p>
+              </div>
+              <button type="button" (click)="showSectionModal = false" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #94A3B8;">&times;</button>
+            </div>
+
+            @if (sectionModalError) {
+              <div style="background: #FEF2F2; color: #991B1B; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 14px; border: 1px solid #FECACA;">
+                {{ sectionModalError }}
+              </div>
+            }
+
+            <form (ngSubmit)="submitSection()">
+              <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px; text-transform: uppercase;">Section Name *</label>
+                <input type="text" [(ngModel)]="newSection.name" name="secName" placeholder="e.g. Section A or Div B" required style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;">
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px; text-transform: uppercase;">Capacity (Seats) *</label>
+                  <input type="number" [(ngModel)]="newSection.capacity" name="secCap" min="1" required style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+                </div>
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px; text-transform: uppercase;">Room Number</label>
+                  <input type="text" [(ngModel)]="newSection.roomNumber" name="secRoom" placeholder="e.g. Room 101" style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #E2E8F0; padding-top: 14px;">
+                <button type="button" (click)="showSectionModal = false" style="padding: 8px 16px; border: 1px solid #CBD5E1; background: white; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; color: #475569;">Cancel</button>
+                <button type="submit" [disabled]="submittingSection" style="padding: 8px 20px; background: #1E5BF6; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(30, 91, 246, 0.3);">
+                  {{ submittingSection ? 'Adding...' : 'Add Section' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      }
     </div>
   `,
   styles: [`
@@ -315,7 +366,19 @@ export class AcademicsComponent implements OnInit {
   newProgram: any = { name: '', code: '', totalSemesters: 8, degreeType: 'Bachelor of Technology' };
   newSubject: any = { name: '', code: '', credits: 4, isElective: false };
 
+  showSectionModal = false;
+  targetClassForSection: ClassModel | null = null;
+  newSection: any = { name: '', capacity: 40, roomNumber: '' };
+  submittingSection = false;
+  sectionModalError = '';
+
   constructor(private api: ApiService) {}
+
+  formatSecName(name: string): string {
+    if (!name) return '';
+    const cleaned = name.replace(/^(section\s*)+/gi, '').trim();
+    return `Section ${cleaned || name}`;
+  }
 
   ngOnInit(): void {
     this.loadAll();
@@ -379,6 +442,50 @@ export class AcademicsComponent implements OnInit {
         this.newSubject.name = '';
         this.newSubject.code = '';
         this.loadAll();
+      }
+    });
+  }
+
+  openAddSectionModal(cls: ClassModel): void {
+    this.targetClassForSection = cls;
+    const nextChar = String.fromCharCode(65 + (cls.sections?.length || 0));
+    this.newSection = {
+      name: `Section ${nextChar}`,
+      capacity: 40,
+      roomNumber: ''
+    };
+    this.sectionModalError = '';
+    this.showSectionModal = true;
+  }
+
+  submitSection(): void {
+    if (!this.targetClassForSection) return;
+    if (!this.newSection.name.trim()) {
+      this.sectionModalError = 'Please enter a section name.';
+      return;
+    }
+
+    this.sectionModalError = '';
+    this.submittingSection = true;
+
+    this.api.createSection({
+      classId: this.targetClassForSection.id,
+      name: this.newSection.name.trim(),
+      capacity: Number(this.newSection.capacity) || 40,
+      roomNumber: this.newSection.roomNumber ? this.newSection.roomNumber.trim() : null
+    }).subscribe({
+      next: (res) => {
+        this.submittingSection = false;
+        if (res.success) {
+          this.showSectionModal = false;
+          this.loadAll();
+        } else {
+          this.sectionModalError = res.message || 'Failed to add section.';
+        }
+      },
+      error: (err) => {
+        this.submittingSection = false;
+        this.sectionModalError = err.error?.message || 'Server error adding section.';
       }
     });
   }

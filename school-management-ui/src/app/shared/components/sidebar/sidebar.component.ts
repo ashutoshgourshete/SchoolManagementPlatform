@@ -10,7 +10,11 @@ import { AuthService } from '../../../core/services/auth.service';
   template: `
     <aside class="sidebar">
       <div class="sidebar-brand">
-        <div class="brand-logo">🎓</div>
+        @if (getLogo()) {
+          <img [src]="getLogo()" alt="Logo" style="width: 36px; height: 36px; object-fit: contain; border-radius: 8px; background: white; padding: 2px;" />
+        } @else {
+          <div class="brand-logo">🎓</div>
+        }
         <div>
           <div class="brand-title">EduManage Cloud</div>
           <div class="brand-subtitle">{{ authService.tenantName() }}</div>
@@ -45,6 +49,11 @@ import { AuthService } from '../../../core/services/auth.service';
           <span>Academics & Classes</span>
         </a>
 
+        <a routerLink="/timetables" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">⏱</span>
+          <span>Timetable & Scheduling</span>
+        </a>
+
         <a routerLink="/attendance" routerLinkActive="active" class="nav-item">
           <span class="nav-icon">📅</span>
           <span>Daily Attendance</span>
@@ -55,9 +64,19 @@ import { AuthService } from '../../../core/services/auth.service';
           <span>Exams & Results</span>
         </a>
 
+        <a routerLink="/assignments" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">📂</span>
+          <span>Homework & Assignments</span>
+        </a>
+
         <a routerLink="/fees" routerLinkActive="active" class="nav-item">
           <span class="nav-icon">💳</span>
           <span>Fees & Invoices</span>
+        </a>
+
+        <a routerLink="/reports" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span>Essential Reports</span>
         </a>
 
         <a routerLink="/announcements" routerLinkActive="active" class="nav-item">
@@ -135,4 +154,8 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class SidebarComponent {
   constructor(public authService: AuthService) {}
+
+  getLogo(): string | null {
+    return localStorage.getItem('institution_custom_logo') || null;
+  }
 }
