@@ -19,6 +19,13 @@ export class AuthService {
   userRole = computed(() => this.currentUser()?.role);
   tenantName = computed(() => this.currentUser()?.tenantName || 'Platform');
   institutionName = computed(() => this.currentUser()?.institutionName || 'Main Institution');
+  tenantLogoUrl = computed(() => this.currentUser()?.tenantLogoUrl || null);
+  institutionLogoUrl = computed(() => {
+    const user = this.currentUser();
+    if (!user) return null;
+    const currentInst = user.availableInstitutions?.find(i => i.institutionId === user.institutionId);
+    return currentInst?.logoUrl || user.institutionLogoUrl || user.tenantLogoUrl || null;
+  });
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -83,11 +90,25 @@ export class AuthService {
       const updated: LoginResponse = {
         ...user,
         institutionId: found.institutionId,
-        institutionName: found.name
+        institutionName: found.name,
+        institutionLogoUrl: found.logoUrl || user.institutionLogoUrl
       };
       this.setSession(updated);
       window.location.reload();
     }
+  }
+
+  updateCurrentInstitutionLogo(logoUrl: string): void {
+    const user = this.currentUser();
+    if (!user) return;
+    const updated: LoginResponse = {
+      ...user,
+      institutionLogoUrl: logoUrl,
+      availableInstitutions: user.availableInstitutions.map(i => 
+        i.institutionId === user.institutionId ? { ...i, logoUrl } : i
+      )
+    };
+    this.setSession(updated);
   }
 
   private setSession(authResult: LoginResponse): void {

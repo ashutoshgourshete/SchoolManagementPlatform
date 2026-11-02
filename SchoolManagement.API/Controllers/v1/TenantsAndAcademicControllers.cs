@@ -61,6 +61,24 @@ public class TenantsController : ControllerBase
         if (!result.Success) return BadRequest(result);
         return Ok(result);
     }
+
+    [HttpPut("institutions/{institutionId:guid}")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal")]
+    public async Task<IActionResult> UpdateInstitution(Guid institutionId, [FromBody] UpdateInstitutionDto dto, CancellationToken cancellationToken)
+    {
+        var result = await _tenantService.UpdateInstitutionAsync(institutionId, dto, cancellationToken);
+        if (!result.Success) return BadRequest(result);
+        return Ok(result);
+    }
+
+    [HttpPatch("{id:guid}/logo")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    public async Task<IActionResult> UpdateTenantLogo(Guid id, [FromBody] string logoUrl, CancellationToken cancellationToken)
+    {
+        var result = await _tenantService.UpdateTenantLogoAsync(id, logoUrl, cancellationToken);
+        if (!result.Success) return BadRequest(result);
+        return Ok(result);
+    }
 }
 
 [ApiController]

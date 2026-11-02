@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { FeeStructure, StudentInvoice, PaymentReceipt, OutstandingBalance, PagedResult, ClassModel, ClassSection, Student } from '../../core/models/models';
 
 interface FeeItemInput {
@@ -677,7 +678,12 @@ interface FeeItemInput {
         <div class="modal-overlay">
           <div class="modal-content" style="max-width: 440px;">
             <div class="text-center border-b border-slate-200 pb-4 mb-4">
-              <div class="text-3xl mb-1">🧾</div>
+              @if (authService.institutionLogoUrl()) {
+                <img [src]="authService.institutionLogoUrl()" alt="School Logo" style="width: 48px; height: 48px; border-radius: 10px; margin: 0 auto 8px auto; object-fit: cover;" />
+              } @else {
+                <div class="text-3xl mb-1">🎓</div>
+              }
+              <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #64748B; letter-spacing: 0.5px;">{{ authService.institutionName() }}</div>
               <h2 class="text-xl font-bold text-slate-900">OFFICIAL FEE RECEIPT</h2>
               <div class="font-mono text-sm font-semibold text-primary">{{ receiptModal.receiptNumber }}</div>
             </div>
@@ -950,7 +956,7 @@ export class FeesComponent implements OnInit {
     return this.invoicesResult.items.reduce((acc, inv) => acc + (inv.totalAmount || 0), 0) || 149034;
   }
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, public authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadFeeStructures();

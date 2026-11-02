@@ -64,7 +64,8 @@ public class AuthService : IAuthService
             Name = im.Institution?.Name ?? string.Empty,
             Code = im.Institution?.Code ?? string.Empty,
             Type = im.Institution?.Type ?? InstitutionType.School,
-            Role = im.Role
+            Role = im.Role,
+            LogoUrl = im.Institution?.LogoUrl
         }).ToList();
 
         var primaryRole = user.PrimaryRole;
@@ -95,8 +96,10 @@ public class AuthService : IAuthService
             Role = primaryRole,
             TenantId = primaryTenant?.Id,
             TenantName = primaryTenant?.Name,
+            TenantLogoUrl = primaryTenant?.LogoUrl,
             InstitutionId = primaryInstitution?.Id,
             InstitutionName = primaryInstitution?.Name,
+            InstitutionLogoUrl = primaryInstitution?.LogoUrl,
             AvailableInstitutions = availableInstitutions
         };
 
@@ -126,6 +129,7 @@ public class AuthService : IAuthService
         {
             Name = request.OrganizationName,
             Code = request.TenantCode.Trim().ToUpperInvariant(),
+            LogoUrl = request.LogoUrl,
             ContactEmail = request.AdminEmail,
             ContactPhone = request.ContactPhone,
             CurrencyCode = string.IsNullOrWhiteSpace(request.CurrencyCode) ? "INR" : request.CurrencyCode,
@@ -164,6 +168,7 @@ public class AuthService : IAuthService
             Type = request.InstitutionType,
             ContactEmail = request.AdminEmail,
             ContactPhone = request.ContactPhone,
+            LogoUrl = request.LogoUrl,
             IsActive = true
         };
         await _context.Institutions.AddAsync(institution, cancellationToken);
@@ -255,8 +260,10 @@ public class AuthService : IAuthService
             Role = UserRoleType.InstitutionAdmin,
             TenantId = tenant.Id,
             TenantName = tenant.Name,
+            TenantLogoUrl = tenant.LogoUrl,
             InstitutionId = institution.Id,
             InstitutionName = institution.Name,
+            InstitutionLogoUrl = institution.LogoUrl,
             AvailableInstitutions = new List<InstitutionSummaryDto>
             {
                 new()
@@ -265,7 +272,8 @@ public class AuthService : IAuthService
                     Name = institution.Name,
                     Code = institution.Code,
                     Type = institution.Type,
-                    Role = UserRoleType.InstitutionAdmin
+                    Role = UserRoleType.InstitutionAdmin,
+                    LogoUrl = institution.LogoUrl
                 }
             }
         };

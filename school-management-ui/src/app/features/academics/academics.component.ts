@@ -88,6 +88,10 @@ import { AcademicYear, ClassModel, ClassSection, Department, Program, Subject, S
           <span>📖</span>
           <span>Subjects &amp; Credits</span>
         </button>
+        <button [class.active]="activeTab === 'profile'" (click)="activeTab = 'profile'; initProfileForm()" class="modern-tab-btn">
+          <span>🏛️</span>
+          <span>School Logo &amp; Profile</span>
+        </button>
       </div>
 
       <!-- TAB 1: Classes & Sections -->
@@ -426,6 +430,104 @@ import { AcademicYear, ClassModel, ClassSection, Department, Program, Subject, S
         </div>
       }
 
+      <!-- TAB 5: School Logo & Profile Settings -->
+      @if (activeTab === 'profile') {
+        <div class="card" style="max-width: 820px; margin: 0 auto;">
+          <div class="card-header border-b border-slate-100 pb-4 mb-6 flex justify-between items-center">
+            <div>
+              <h2 class="card-title text-xl font-bold text-slate-900">Institution &amp; School Branding</h2>
+              <p class="text-sm text-slate-500">Configure your official school logo, emblem, contact profile, and display identity</p>
+            </div>
+            @if (profileForm.logoUrl) {
+              <img [src]="profileForm.logoUrl" alt="Current Logo" class="brand-logo-img" style="width: 52px; height: 52px; border-radius: 12px;" />
+            }
+          </div>
+
+          @if (profileActionSuccess) {
+            <div class="alert alert-success mb-6">{{ profileActionSuccess }}</div>
+          }
+          @if (profileActionError) {
+            <div class="alert alert-danger mb-6">{{ profileActionError }}</div>
+          }
+
+          <form (ngSubmit)="saveInstitutionProfile()" class="flex flex-col gap-5">
+            <!-- Logo Preview & Input -->
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+              <label class="block text-sm font-bold text-slate-900 mb-2">School / College Logo (URL or Sample Emblem)</label>
+              <div class="flex gap-4 items-center mb-4">
+                <div class="h-16 w-16 rounded-xl border-2 border-dashed border-indigo-300 bg-white flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+                  @if (profileForm.logoUrl) {
+                    <img [src]="profileForm.logoUrl" alt="Preview" class="h-full w-full object-cover" />
+                  } @else {
+                    <span style="font-size: 28px;">🏫</span>
+                  }
+                </div>
+                <div class="flex-1">
+                  <input 
+                    type="url" 
+                    class="form-control font-mono text-sm" 
+                    [(ngModel)]="profileForm.logoUrl" 
+                    name="logoUrl" 
+                    placeholder="https://images.unsplash.com/... or https://your-school.edu/logo.png" />
+                  <p class="text-xs text-slate-500 mt-1">This custom logo will automatically appear in your sidebar, header, fee receipts, and official transcripts.</p>
+                </div>
+              </div>
+
+              <!-- Quick Presets -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold text-slate-600">Sample School Logos:</span>
+                <button type="button" (click)="setPresetLogo('https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=128&auto=format&fit=crop&q=80')" class="btn btn-outline btn-xs" style="font-size: 11px;">🎓 Academic Crest</button>
+                <button type="button" (click)="setPresetLogo('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=128&auto=format&fit=crop&q=80')" class="btn btn-outline btn-xs" style="font-size: 11px;">🏛️ University Seal</button>
+                <button type="button" (click)="setPresetLogo('https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=128&auto=format&fit=crop&q=80')" class="btn btn-outline btn-xs" style="font-size: 11px;">📚 Modern School</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Institution / School Name *</label>
+                <input type="text" class="form-control" [(ngModel)]="profileForm.name" name="name" required />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Institution Type</label>
+                <select class="form-control" [(ngModel)]="profileForm.type" name="type">
+                  <option [value]="1">K-12 Primary/Secondary School</option>
+                  <option [value]="2">Degree College / University</option>
+                  <option [value]="3">Combined School &amp; Junior College</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Contact Email</label>
+                <input type="email" class="form-control" [(ngModel)]="profileForm.contactEmail" name="contactEmail" />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Contact Phone</label>
+                <input type="text" class="form-control" [(ngModel)]="profileForm.contactPhone" name="contactPhone" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Official Website</label>
+                <input type="url" class="form-control" [(ngModel)]="profileForm.website" name="website" placeholder="https://..." />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Campus Address</label>
+                <input type="text" class="form-control" [(ngModel)]="profileForm.address" name="address" />
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
+              <button type="submit" class="btn btn-primary px-6" [disabled]="savingProfile">
+                {{ savingProfile ? 'Saving Logo & Profile...' : '💾 Save Logo & School Profile' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+
       <!-- MODAL: Add Section to Class -->
       @if (showSectionModal && targetClassForSection) {
         <div class="modal-overlay">
@@ -567,7 +669,22 @@ import { AcademicYear, ClassModel, ClassSection, Department, Program, Subject, S
   `]
 })
 export class AcademicsComponent implements OnInit {
-  activeTab: 'classes' | 'years' | 'programs' | 'subjects' = 'classes';
+  activeTab: 'classes' | 'years' | 'programs' | 'subjects' | 'profile' = 'classes';
+
+  // School Profile & Logo State
+  profileForm: any = {
+    id: '',
+    name: '',
+    type: 1,
+    contactEmail: '',
+    contactPhone: '',
+    address: '',
+    website: '',
+    logoUrl: ''
+  };
+  savingProfile = false;
+  profileActionSuccess = '';
+  profileActionError = '';
 
   classes: ClassModel[] = [];
   filteredClasses: ClassModel[] = [];
@@ -642,6 +759,65 @@ export class AcademicsComponent implements OnInit {
 
     this.loadAll();
     this.loadStaffList();
+    this.initProfileForm();
+  }
+
+  initProfileForm(): void {
+    const user = this.authService.currentUser();
+    const instId = this.selectedInstitutionId || this.authService.getSelectedInstitutionId();
+    const inst = user?.availableInstitutions.find(i => i.institutionId === instId);
+    this.profileForm = {
+      id: instId || '',
+      name: inst?.name || this.authService.institutionName(),
+      type: inst?.type || 1,
+      contactEmail: user?.email || '',
+      contactPhone: '',
+      address: '',
+      website: '',
+      logoUrl: inst?.logoUrl || this.authService.institutionLogoUrl() || ''
+    };
+    this.profileActionSuccess = '';
+    this.profileActionError = '';
+  }
+
+  setPresetLogo(url: string): void {
+    this.profileForm.logoUrl = url;
+  }
+
+  saveInstitutionProfile(): void {
+    if (!this.profileForm.id) {
+      this.profileActionError = 'No institution selected.';
+      return;
+    }
+    this.savingProfile = true;
+    this.profileActionSuccess = '';
+    this.profileActionError = '';
+
+    this.api.updateInstitution(this.profileForm.id, {
+      name: this.profileForm.name,
+      type: Number(this.profileForm.type),
+      contactEmail: this.profileForm.contactEmail,
+      contactPhone: this.profileForm.contactPhone,
+      address: this.profileForm.address,
+      website: this.profileForm.website,
+      logoUrl: this.profileForm.logoUrl
+    }).subscribe({
+      next: (res) => {
+        this.savingProfile = false;
+        if (res.success) {
+          this.profileActionSuccess = 'School logo and profile updated successfully!';
+          if (this.profileForm.logoUrl) {
+            this.authService.updateCurrentInstitutionLogo(this.profileForm.logoUrl);
+          }
+        } else {
+          this.profileActionError = res.message || 'Failed to update profile.';
+        }
+      },
+      error: (err) => {
+        this.savingProfile = false;
+        this.profileActionError = err.error?.message || 'Server error while updating profile.';
+      }
+    });
   }
 
   onInstitutionFilterChange(newInstId: string): void {

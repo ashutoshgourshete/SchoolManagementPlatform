@@ -11,7 +11,14 @@ import { AuthService } from '../../../core/services/auth.service';
       <!-- Left: Institution Selector Pill -->
       <div class="flex items-center gap-3">
         <div class="institution-pill-selector">
-          <span style="font-size: 16px;">🏫</span>
+          @if (authService.institutionLogoUrl()) {
+            <img 
+              [src]="authService.institutionLogoUrl()" 
+              alt="School Logo" 
+              class="institution-pill-logo" />
+          } @else {
+            <span style="font-size: 16px;">🏫</span>
+          }
           <select 
             class="institution-select-field"
             [value]="authService.getSelectedInstitutionId()"

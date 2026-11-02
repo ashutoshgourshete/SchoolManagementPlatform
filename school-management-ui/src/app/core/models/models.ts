@@ -25,14 +25,17 @@ export interface LoginResponse {
   role: string | number;
   tenantId?: string;
   tenantName?: string;
+  tenantLogoUrl?: string;
   institutionId?: string;
   institutionName?: string;
+  institutionLogoUrl?: string;
   availableInstitutions: {
     institutionId: string;
     name: string;
     code: string;
     type: number;
     role: number;
+    logoUrl?: string;
   }[];
 }
 

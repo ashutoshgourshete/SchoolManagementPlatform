@@ -21,6 +21,8 @@ public interface ITenantService
     Task<ApiResponse<TenantDto>> UpdateTenantStatusAsync(Guid id, TenantStatus status, CancellationToken cancellationToken = default);
     Task<ApiResponse<List<InstitutionDto>>> GetInstitutionsAsync(Guid tenantId, CancellationToken cancellationToken = default);
     Task<ApiResponse<InstitutionDto>> CreateInstitutionAsync(Guid tenantId, CreateInstitutionDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<InstitutionDto>> UpdateInstitutionAsync(Guid id, UpdateInstitutionDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<TenantDto>> UpdateTenantLogoAsync(Guid tenantId, string logoUrl, CancellationToken cancellationToken = default);
 }
 
 public interface IAcademicService

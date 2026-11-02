@@ -107,6 +107,7 @@ public static class DbSeeder
                 Name = "Apex International Academy",
                 Code = "APEX",
                 Domain = "apex.schoolsaas.com",
+                LogoUrl = "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=128&auto=format&fit=crop&q=80",
                 Status = TenantStatus.Active,
                 ContactEmail = "contact@apexacademy.edu",
                 ContactPhone = "+91 98765 43210",
@@ -141,6 +142,7 @@ public static class DbSeeder
                 ContactPhone = "+91 98765 43211",
                 Address = "Plot 42, Knowledge Park, Bengaluru",
                 Website = "https://apexacademy.edu",
+                LogoUrl = "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=128&auto=format&fit=crop&q=80",
                 IsActive = true
             };
             await context.Institutions.AddAsync(institution);

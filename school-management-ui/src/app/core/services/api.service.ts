@@ -247,6 +247,14 @@ export class ApiService {
     return this.http.post<ApiResponse<TenantSubscription>>(`${this.baseUrl}/subscriptions/subscribe`, payload);
   }
 
+  getTenantInstitutions(tenantId: string): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/tenants/${tenantId}/institutions`);
+  }
+
+  updateInstitution(institutionId: string, payload: any): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.baseUrl}/tenants/institutions/${institutionId}`, payload);
+  }
+
   // Announcements
   getAnnouncements(audience?: string): Observable<ApiResponse<Announcement[]>> {
     let params = new HttpParams();

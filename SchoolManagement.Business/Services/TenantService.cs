@@ -36,6 +36,7 @@ public class TenantService : ITenantService
             Name = t.Name,
             Code = t.Code,
             Domain = t.Domain,
+            LogoUrl = t.LogoUrl,
             Status = t.Status,
             ContactEmail = t.ContactEmail,
             ContactPhone = t.ContactPhone,
@@ -70,6 +71,7 @@ public class TenantService : ITenantService
             Name = t.Name,
             Code = t.Code,
             Domain = t.Domain,
+            LogoUrl = t.LogoUrl,
             Status = t.Status,
             ContactEmail = t.ContactEmail,
             ContactPhone = t.ContactPhone,
@@ -118,6 +120,7 @@ public class TenantService : ITenantService
             ContactPhone = i.ContactPhone,
             Address = i.Address,
             Website = i.Website,
+            LogoUrl = i.LogoUrl,
             IsActive = i.IsActive
         }).ToList();
 
@@ -147,6 +150,7 @@ public class TenantService : ITenantService
             ContactPhone = dto.ContactPhone,
             Address = dto.Address,
             Website = dto.Website,
+            LogoUrl = dto.LogoUrl,
             IsActive = true
         };
 
@@ -164,7 +168,63 @@ public class TenantService : ITenantService
             ContactPhone = inst.ContactPhone,
             Address = inst.Address,
             Website = inst.Website,
+            LogoUrl = inst.LogoUrl,
             IsActive = inst.IsActive
         }, "Institution created successfully");
+    }
+
+    public async Task<ApiResponse<InstitutionDto>> UpdateInstitutionAsync(Guid id, UpdateInstitutionDto dto, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Institutions.IgnoreQueryFilters();
+        if (!_currentTenantService.IsPlatformAdmin && _currentTenantService.TenantId.HasValue)
+        {
+            query = query.Where(i => i.TenantId == _currentTenantService.TenantId.Value);
+        }
+
+        var inst = await query.FirstOrDefaultAsync(i => i.Id == id && !i.IsDeleted, cancellationToken);
+        if (inst == null)
+        {
+            return ApiResponse<InstitutionDto>.Fail("Institution not found or unauthorized");
+        }
+
+        inst.Name = dto.Name;
+        inst.Type = dto.Type;
+        inst.ContactEmail = dto.ContactEmail;
+        inst.ContactPhone = dto.ContactPhone;
+        inst.Address = dto.Address;
+        inst.Website = dto.Website;
+        inst.LogoUrl = dto.LogoUrl;
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return ApiResponse<InstitutionDto>.Ok(new InstitutionDto
+        {
+            Id = inst.Id,
+            TenantId = inst.TenantId,
+            Name = inst.Name,
+            Code = inst.Code,
+            Type = inst.Type,
+            ContactEmail = inst.ContactEmail,
+            ContactPhone = inst.ContactPhone,
+            Address = inst.Address,
+            Website = inst.Website,
+            LogoUrl = inst.LogoUrl,
+            IsActive = inst.IsActive
+        }, "Institution profile and logo updated successfully");
+    }
+
+    public async Task<ApiResponse<TenantDto>> UpdateTenantLogoAsync(Guid tenantId, string logoUrl, CancellationToken cancellationToken = default)
+    {
+        var targetTenantId = _currentTenantService.IsPlatformAdmin ? tenantId : (_currentTenantService.TenantId ?? tenantId);
+        var tenant = await _context.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == targetTenantId, cancellationToken);
+        if (tenant == null)
+        {
+            return ApiResponse<TenantDto>.Fail("Tenant not found");
+        }
+
+        tenant.LogoUrl = logoUrl;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return await GetTenantByIdAsync(targetTenantId, cancellationToken);
     }
 }

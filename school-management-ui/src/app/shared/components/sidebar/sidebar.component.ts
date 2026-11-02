@@ -9,12 +9,24 @@ import { AuthService } from '../../../core/services/auth.service';
   imports: [CommonModule, RouterModule],
   template: `
     <aside class="sidebar-royal">
-      <!-- Brand Logo Header -->
+      <!-- Brand Logo Header with Institution / School Logo Support -->
       <div class="sidebar-brand-box">
-        <div class="brand-emblem">🎓</div>
-        <div>
-          <div class="brand-heading-text">EduManage</div>
-          <div class="brand-tagline-text">{{ authService.tenantName() || 'Cloud SaaS Platform' }}</div>
+        @if (authService.institutionLogoUrl() && !logoFailed) {
+          <img 
+            [src]="authService.institutionLogoUrl()" 
+            alt="Institution Logo" 
+            class="brand-logo-img" 
+            (error)="logoFailed = true" />
+        } @else {
+          <div class="brand-emblem">🎓</div>
+        }
+        <div style="overflow: hidden;">
+          <div class="brand-heading-text" [title]="authService.institutionName()">
+            {{ authService.institutionName() || 'EduManage' }}
+          </div>
+          <div class="brand-tagline-text" [title]="authService.tenantName()">
+            {{ authService.tenantName() || 'Cloud SaaS Platform' }}
+          </div>
         </div>
       </div>
 
@@ -102,5 +114,6 @@ import { AuthService } from '../../../core/services/auth.service';
   `
 })
 export class SidebarComponent {
+  logoFailed = false;
   constructor(public authService: AuthService) {}
 }
