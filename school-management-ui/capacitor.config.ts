@@ -1,6 +1,4 @@
-import type { CapacitorConfig } from '@capacitor/cli';
-
-const config: CapacitorConfig = {
+const config = {
   appId: 'com.edumanage.school',
   appName: 'EduManage Cloud',
   webDir: 'dist/school-management-ui/browser'
