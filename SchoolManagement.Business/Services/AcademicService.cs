@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Business.Interfaces;
 using SchoolManagement.Data;
-using SchoolManagement.Data.Services;
 using SchoolManagement.Models.Common;
 using SchoolManagement.Models.DTOs;
 using SchoolManagement.Models.Entities;
@@ -11,12 +10,10 @@ namespace SchoolManagement.Business.Services;
 public class AcademicService : IAcademicService
 {
     private readonly ApplicationDbContext _context;
-    private readonly ICurrentTenantService _currentTenantService;
 
-    public AcademicService(ApplicationDbContext context, ICurrentTenantService currentTenantService)
+    public AcademicService(ApplicationDbContext context)
     {
         _context = context;
-        _currentTenantService = currentTenantService;
     }
 
     public async Task<ApiResponse<List<AcademicYearDto>>> GetAcademicYearsAsync(CancellationToken cancellationToken = default)
@@ -184,25 +181,17 @@ public class AcademicService : IAcademicService
         }, "Program created successfully");
     }
 
-    public async Task<ApiResponse<List<ClassDto>>> GetClassesAsync(Guid? academicYearId = null, Guid? institutionId = null, CancellationToken cancellationToken = default)
+    public async Task<ApiResponse<List<ClassDto>>> GetClassesAsync(Guid? academicYearId = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Classes
-            .Include(c => c.Institution)
             .Include(c => c.AcademicYear)
             .Include(c => c.Department)
             .Include(c => c.Program)
             .Include(c => c.Sections)
                 .ThenInclude(s => s.ClassTeacher)
-            .Where(c => !c.IsDeleted)
             .AsQueryable();
 
-        var effectiveInstitutionId = institutionId ?? _currentTenantService.InstitutionId;
-        if (effectiveInstitutionId.HasValue && effectiveInstitutionId.Value != Guid.Empty)
-        {
-            query = query.Where(c => c.InstitutionId == effectiveInstitutionId.Value);
-        }
-
-        if (academicYearId.HasValue && academicYearId.Value != Guid.Empty)
+        if (academicYearId.HasValue)
         {
             query = query.Where(c => c.AcademicYearId == academicYearId.Value);
         }
@@ -212,10 +201,8 @@ public class AcademicService : IAcademicService
             .Select(c => new ClassDto
             {
                 Id = c.Id,
-                InstitutionId = c.InstitutionId,
-                InstitutionName = c.Institution != null ? c.Institution.Name : null,
                 AcademicYearId = c.AcademicYearId,
-                AcademicYearName = c.AcademicYear != null ? c.AcademicYear.Name : string.Empty,
+                AcademicYearName = c.AcademicYear.Name,
                 DepartmentId = c.DepartmentId,
                 DepartmentName = c.Department != null ? c.Department.Name : null,
                 ProgramId = c.ProgramId,
@@ -223,17 +210,16 @@ public class AcademicService : IAcademicService
                 Name = c.Name,
                 Code = c.Code,
                 SemesterNumber = c.SemesterNumber,
-                Sections = c.Sections.Where(s => !s.IsDeleted).Select(s => new ClassSectionDto
+                Sections = c.Sections.Select(s => new ClassSectionDto
                 {
                     Id = s.Id,
-                    InstitutionId = s.InstitutionId,
                     ClassId = s.ClassId,
                     ClassName = c.Name,
                     Name = s.Name,
                     Capacity = s.Capacity,
                     RoomNumber = s.RoomNumber,
                     ClassTeacherId = s.ClassTeacherId,
-                    ClassTeacherName = s.ClassTeacher != null ? s.ClassTeacher.FirstName + " " + s.ClassTeacher.LastName : null,
+                    ClassTeacherName = s.ClassTeacher != null ? s.ClassTeacher.FullName : null,
                     EnrolledStudentCount = _context.Enrollments.Count(e => e.ClassSectionId == s.Id && e.IsActive && !e.IsDeleted)
                 }).ToList()
             })
@@ -264,8 +250,8 @@ public class AcademicService : IAcademicService
             AcademicYearId = dto.AcademicYearId,
             DepartmentId = dto.DepartmentId,
             ProgramId = dto.ProgramId,
-            Name = dto.Name.Trim(),
-            Code = dto.Code.Trim(),
+            Name = dto.Name,
+            Code = dto.Code,
             SemesterNumber = dto.SemesterNumber
         };
 
@@ -275,7 +261,6 @@ public class AcademicService : IAcademicService
         return ApiResponse<ClassDto>.Ok(new ClassDto
         {
             Id = cls.Id,
-            InstitutionId = cls.InstitutionId,
             AcademicYearId = cls.AcademicYearId,
             Name = cls.Name,
             Code = cls.Code,
@@ -283,41 +268,22 @@ public class AcademicService : IAcademicService
         }, "Class created successfully");
     }
 
-    public async Task<ApiResponse<bool>> DeleteClassAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        var cls = await _context.Classes
-            .Include(c => c.Sections)
-            .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted, cancellationToken);
-
-        if (cls == null) return ApiResponse<bool>.Fail("Class not found");
-
-        cls.IsDeleted = true;
-        foreach (var sec in cls.Sections)
-        {
-            sec.IsDeleted = true;
-        }
-
-        await _context.SaveChangesAsync(cancellationToken);
-        return ApiResponse<bool>.Ok(true, "Class removed successfully");
-    }
-
     public async Task<ApiResponse<List<ClassSectionDto>>> GetClassSectionsAsync(Guid classId, CancellationToken cancellationToken = default)
     {
         var sections = await _context.ClassSections
             .Include(cs => cs.Class)
             .Include(cs => cs.ClassTeacher)
-            .Where(cs => cs.ClassId == classId && !cs.IsDeleted)
+            .Where(cs => cs.ClassId == classId)
             .Select(s => new ClassSectionDto
             {
                 Id = s.Id,
-                InstitutionId = s.InstitutionId,
                 ClassId = s.ClassId,
                 ClassName = s.Class.Name,
                 Name = s.Name,
                 Capacity = s.Capacity,
                 RoomNumber = s.RoomNumber,
                 ClassTeacherId = s.ClassTeacherId,
-                ClassTeacherName = s.ClassTeacher != null ? s.ClassTeacher.FirstName + " " + s.ClassTeacher.LastName : null,
+                ClassTeacherName = s.ClassTeacher != null ? s.ClassTeacher.FullName : null,
                 EnrolledStudentCount = _context.Enrollments.Count(e => e.ClassSectionId == s.Id && e.IsActive && !e.IsDeleted)
             })
             .ToListAsync(cancellationToken);
@@ -348,23 +314,12 @@ public class AcademicService : IAcademicService
         return ApiResponse<ClassSectionDto>.Ok(new ClassSectionDto
         {
             Id = section.Id,
-            InstitutionId = section.InstitutionId,
             ClassId = section.ClassId,
             Name = section.Name,
             Capacity = section.Capacity,
             RoomNumber = section.RoomNumber,
             ClassTeacherId = section.ClassTeacherId
         }, "Section created successfully");
-    }
-
-    public async Task<ApiResponse<bool>> DeleteClassSectionAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        var sec = await _context.ClassSections.FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted, cancellationToken);
-        if (sec == null) return ApiResponse<bool>.Fail("Class section not found");
-
-        sec.IsDeleted = true;
-        await _context.SaveChangesAsync(cancellationToken);
-        return ApiResponse<bool>.Ok(true, "Class section removed successfully");
     }
 
     public async Task<ApiResponse<List<SubjectDto>>> GetSubjectsAsync(CancellationToken cancellationToken = default)

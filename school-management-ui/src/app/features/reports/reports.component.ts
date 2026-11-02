@@ -16,7 +16,7 @@ import {
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div>
+    <div class="page-container">
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
         <div>
@@ -31,35 +31,32 @@ import {
       </div>
 
       <!-- Navigation Tabs -->
-      <div class="tab-bar mb-6">
-        <button 
-          (click)="activeTab = 'executive'" 
-          [class.active]="activeTab === 'executive'"
-          class="tab-btn">
-          <span>📊</span>
-          <span>Executive Summary</span>
-        </button>
-        <button 
-          (click)="activeTab = 'financial'" 
-          [class.active]="activeTab === 'financial'"
-          class="tab-btn">
-          <span>💳</span>
-          <span>Fees, Defaulters & Receipts</span>
-        </button>
-        <button 
-          (click)="activeTab = 'attendance'" 
-          [class.active]="activeTab === 'attendance'"
-          class="tab-btn">
-          <span>📅</span>
-          <span>Attendance Analytics (< 75% Flag)</span>
-        </button>
-        <button 
-          (click)="activeTab = 'enrollment'" 
-          [class.active]="activeTab === 'enrollment'"
-          class="tab-btn">
-          <span>👨‍🎓</span>
-          <span>Enrollment & Demographics</span>
-        </button>
+      <div class="card mb-6">
+        <div class="modern-tab-bar" style="display: inline-flex; background: #F1F5F9; padding: 6px; border-radius: 9999px; gap: 6px; border: 1px solid #E2E8F0;">
+          <button 
+            (click)="activeTab = 'executive'" [class.active]="activeTab === 'executive'" 
+            class="modern-tab-btn">
+            📊 Executive Summary
+          </button>
+          <button 
+            (click)="activeTab = 'financial'" 
+            [class.active]="activeTab === 'financial'"
+            class="modern-tab-btn">
+            💳 Fees, Defaulters & Receipts
+          </button>
+          <button 
+            (click)="activeTab = 'attendance'" 
+            [class.active]="activeTab === 'attendance'"
+            class="modern-tab-btn">
+            📅 Attendance Analytics (< 75% Flag)
+          </button>
+          <button 
+            (click)="activeTab = 'enrollment'" 
+            [class.active]="activeTab === 'enrollment'"
+            class="modern-tab-btn">
+            👨‍🎓 Enrollment & Demographics
+          </button>
+        </div>
       </div>
 
       <!-- TAB 1: EXECUTIVE SUMMARY -->
