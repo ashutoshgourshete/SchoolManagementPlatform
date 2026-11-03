@@ -56,6 +56,33 @@ EduManage हे 100% Mobile Responsive आणि Touch-Friendly डिझाइ
 
 ---
 
+### पद्धत ४: Cloudflare Tunnel द्वारे इंटरनेटवर १००% मोफत व सुरक्षित थेट लाईव्ह चालवणे (Zero Cost)
+कोणताही सर्व्हर किंवा डोमेन विकत न घेता तुमच्या PC वरून संपूर्ण जगात मोफत व बँक-दर्जाच्या सुरक्षिततेने लाईव्ह करण्यासाठी:
+
+1. **`cloudflared-windows-amd64.exe` डाऊनलोड करा:**
+   - [Cloudflare अधिकृत रिलीझ लिंक](https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe)
+   - ही `.exe` फाईल डाऊनलोड करून त्याचे नाव बदलून `cloudflared.exe` ठेवा आणि प्रोजेक्टच्या मुख्य फोल्डरमध्ये ठेवा (किंवा Windows PATH मध्ये ॲड करा).
+
+2. **एका क्लिकमध्ये सर्व सुरू करा:**
+   - प्रोजेक्टच्या मुख्य फोल्डरमधील **`start-live-tunnel.bat`** वर डबल क्लिक करा.
+   - किंवा स्वतः ३ कमांड्स वेगवेगळ्या विंडोमध्ये चालवा:
+     ```powershell
+     # विंडो १: Backend
+     cd SchoolManagement.API && dotnet run
+
+     # विंडो २: Frontend with Proxy
+     cd school-management-ui && npm run start:tunnel
+
+     # विंडो ३: Cloudflare Tunnel
+     cloudflared tunnel --url http://localhost:4200
+     ```
+
+3. **मोफत सुरक्षित लिंक मिळवा:**
+   - स्क्रीनवर `https://xxxxxx.trycloudflare.com` अशी HTTPS लिंक दिसेल.
+   - ही लिंक कोणत्याही मोबाईलवर किंवा इतर कोणालाही पाठवून लगेच लॉगिन करून दाखवा!
+
+---
+
 ### पद्धत १: एकाच वायफाय (Wi-Fi) नेटवर्कवर मोबाईल ब्राउझरमध्ये चालवणे (झटपट पद्धत)
 जर तुमचा कॉम्प्युटर आणि मोबाईल एकाच Wi-Fi शी जोडलेले असतील:
 
