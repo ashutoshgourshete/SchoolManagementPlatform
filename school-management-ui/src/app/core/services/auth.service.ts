@@ -22,6 +22,15 @@ export class AuthService {
   tenantLogoUrl = computed(() => this.currentUser()?.tenantLogoUrl || null);
   customLogo = signal<string | null>(typeof window !== 'undefined' ? localStorage.getItem('institution_custom_logo') : null);
   isLogoModalOpen = signal<boolean>(false);
+  isMobileSidebarOpen = signal<boolean>(false);
+
+  toggleMobileSidebar(): void {
+    this.isMobileSidebarOpen.update(v => !v);
+  }
+
+  closeMobileSidebar(): void {
+    this.isMobileSidebarOpen.set(false);
+  }
 
   openLogoModal(): void {
     this.isLogoModalOpen.set(true);

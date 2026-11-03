@@ -5,6 +5,9 @@ import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
+  host: {
+    '[class.mobile-open]': 'authService.isMobileSidebarOpen()'
+  },
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
@@ -25,7 +28,7 @@ import { AuthService } from '../../../core/services/auth.service';
       </div>
 
       <nav class="sidebar-nav">
-        <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-item" (click)="authService.closeMobileSidebar()">
           <span class="nav-icon">📊</span>
           <span>Dashboard</span>
         </a>
@@ -103,6 +106,21 @@ import { AuthService } from '../../../core/services/auth.service';
       display: block;
       height: 100vh;
       flex-shrink: 0;
+      transition: transform 0.25s ease-in-out;
+    }
+    @media (max-width: 768px) {
+      :host {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 999;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+      }
+      :host.mobile-open {
+        transform: translateX(0);
+      }
     }
     .sidebar {
       width: 255px;

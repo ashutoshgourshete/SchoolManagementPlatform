@@ -30,6 +30,30 @@ import { AuthService } from '../../../core/services/auth.service';
       top: 0;
       z-index: 40;
     }
+    .btn-hamburger-mobile {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid #CBD5E1;
+      background: #FFFFFF;
+      font-size: 18px;
+      color: #334155;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      .btn-hamburger-mobile {
+        display: flex;
+      }
+      .user-profile-meta {
+        display: none;
+      }
+      .top-navbar-bar {
+        padding: 0 12px;
+      }
+    }
     .left-nav-group {
       display: flex;
       align-items: center;
@@ -247,6 +271,9 @@ import { AuthService } from '../../../core/services/auth.service';
     <header class="top-navbar-bar">
       <!-- Left: Active Institution Selector & Logo Manage Button -->
       <div class="left-nav-group">
+        <button type="button" (click)="authService.toggleMobileSidebar()" class="btn-hamburger-mobile" title="Toggle menu">
+          ☰
+        </button>
         <div class="inst-pill-container">
           @if (authService.getEffectiveLogo()) {
             <img [src]="authService.getEffectiveLogo()" alt="Logo" style="width: 26px; height: 26px; object-fit: contain; border-radius: 6px; background: white; padding: 1px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" />
