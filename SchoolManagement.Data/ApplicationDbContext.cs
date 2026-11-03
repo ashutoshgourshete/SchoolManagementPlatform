@@ -193,6 +193,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .HasForeignKey(s => s.DepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Entity<Staff>()
+            .HasOne(s => s.ReportsToStaff)
+            .WithMany(s => s.DirectReports)
+            .HasForeignKey(s => s.ReportsToStaffId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Entity<ClassSection>()
             .HasOne(cs => cs.ClassTeacher)
             .WithMany(s => s.AssignedClassSections)

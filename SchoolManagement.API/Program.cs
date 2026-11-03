@@ -166,6 +166,17 @@ using (var scope = app.Services.CreateScope())
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
+        try
+        {
+            await context.Database.ExecuteSqlRawAsync(@"
+                IF OBJECT_ID('StaffMembers', 'U') IS NOT NULL AND COL_LENGTH('StaffMembers', 'ReportsToStaffId') IS NULL
+                BEGIN
+                    ALTER TABLE StaffMembers ADD ReportsToStaffId uniqueidentifier NULL;
+                END
+            ");
+        }
+        catch { }
+
         await context.Database.MigrateAsync();
         await DbSeeder.SeedAsync(context, userManager, roleManager);
     }
