@@ -103,6 +103,11 @@ All 6 test suites verify:
    ```
 4. Access the dashboard at `http://localhost:4200`.
 
+### Mobile & Touch Device Access
+EduManage features a responsive sliding drawer menu (hamburger toggle `☰`), touch-friendly form controls, and PWA / Capacitor Android support.
+For detailed instructions on running on mobile devices over Wi-Fi, PWA "Add to Home Screen", or generating an Android APK, refer to:
+👉 **[MOBILE_AND_OPERATIONS_GUIDE.md](file:///c:/Users/ashutosh.gourshete/.gemini/antigravity/scratch/SchoolManagementPlatform/MOBILE_AND_OPERATIONS_GUIDE.md)**
+
 ---
 
 ## 5. Low-Cost Production Deployment & Monthly Cost in INR
