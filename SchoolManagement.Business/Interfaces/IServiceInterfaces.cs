@@ -21,6 +21,8 @@ public interface ITenantService
     Task<ApiResponse<TenantDto>> UpdateTenantStatusAsync(Guid id, TenantStatus status, CancellationToken cancellationToken = default);
     Task<ApiResponse<List<InstitutionDto>>> GetInstitutionsAsync(Guid tenantId, CancellationToken cancellationToken = default);
     Task<ApiResponse<InstitutionDto>> CreateInstitutionAsync(Guid tenantId, CreateInstitutionDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<InstitutionDto>> UpdateInstitutionAsync(Guid id, UpdateInstitutionDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<TenantDto>> UpdateTenantLogoAsync(Guid tenantId, string logoUrl, CancellationToken cancellationToken = default);
 }
 
 public interface IAcademicService
@@ -35,11 +37,13 @@ public interface IAcademicService
     Task<ApiResponse<List<ProgramDto>>> GetProgramsAsync(CancellationToken cancellationToken = default);
     Task<ApiResponse<ProgramDto>> CreateProgramAsync(CreateProgramDto dto, CancellationToken cancellationToken = default);
 
-    Task<ApiResponse<List<ClassDto>>> GetClassesAsync(Guid? academicYearId = null, CancellationToken cancellationToken = default);
+    Task<ApiResponse<List<ClassDto>>> GetClassesAsync(Guid? academicYearId = null, Guid? institutionId = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<ClassDto>> CreateClassAsync(CreateClassDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<bool>> DeleteClassAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<ApiResponse<List<ClassSectionDto>>> GetClassSectionsAsync(Guid classId, CancellationToken cancellationToken = default);
     Task<ApiResponse<ClassSectionDto>> CreateClassSectionAsync(CreateClassSectionDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<bool>> DeleteClassSectionAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<ApiResponse<List<SubjectDto>>> GetSubjectsAsync(CancellationToken cancellationToken = default);
     Task<ApiResponse<SubjectDto>> CreateSubjectAsync(CreateSubjectDto dto, CancellationToken cancellationToken = default);
@@ -63,6 +67,7 @@ public interface IStaffService
     Task<ApiResponse<PagedResult<StaffDto>>> GetStaffAsync(PaginationFilter filter, Guid? departmentId = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<StaffDto>> GetStaffByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ApiResponse<StaffDto>> CreateStaffAsync(CreateStaffDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<List<StaffHierarchyDto>>> GetHierarchyTreeAsync(CancellationToken cancellationToken = default);
 }
 
 public interface IAttendanceService
@@ -85,7 +90,9 @@ public interface IFeeManagementService
 {
     Task<ApiResponse<List<FeeStructureDto>>> GetFeeStructuresAsync(Guid? academicYearId = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<FeeStructureDto>> CreateFeeStructureAsync(CreateFeeStructureDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<bool>> DeleteFeeStructureAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ApiResponse<StudentFeeAssignmentDto>> AssignFeeToStudentAsync(AssignFeeDto dto, CancellationToken cancellationToken = default);
+    Task<ApiResponse<int>> AssignFeeToClassSectionAsync(Guid classSectionId, Guid feeStructureId, decimal discountPercentage = 0, CancellationToken cancellationToken = default);
 
     Task<ApiResponse<PagedResult<StudentInvoiceDto>>> GetInvoicesAsync(PaginationFilter filter, Guid? studentId = null, InvoiceStatus? status = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<StudentInvoiceDto>> GetInvoiceByIdAsync(Guid id, CancellationToken cancellationToken = default);

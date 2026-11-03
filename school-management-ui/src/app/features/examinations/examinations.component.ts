@@ -9,21 +9,23 @@ import { Exam, ExamResult, StudentReportCard, Student } from '../../core/models/
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="page-container">
-      <div class="flex items-center justify-between mb-6">
+    <div>
+      <div class="flex items-center justify-between mb-5">
         <div>
-          <h1 class="text-2xl font-bold text-slate-900">Examinations & Report Cards</h1>
-          <p class="text-sm text-slate-500">Schedule assessments, record grades, and generate student performance transcripts</p>
+          <h1 class="text-2xl font-bold text-slate-900" style="letter-spacing: -0.3px;">Examinations &amp; Report Cards</h1>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Schedule assessments, record grades, and generate student performance transcripts</p>
         </div>
       </div>
 
-      <!-- Tab Bar -->
-      <div class="tab-bar mb-6">
+      <!-- Tab Bar with Modern Capsules -->
+      <div class="tab-bar mb-5">
         <button [class.active]="activeTab === 'exams'" (click)="activeTab = 'exams'" class="tab-btn">
-          Exam Schedule
+          <span>📝</span>
+          <span>Exam Schedule &amp; Marks Entry</span>
         </button>
         <button [class.active]="activeTab === 'report'" (click)="activeTab = 'report'" class="tab-btn">
-          Generate Student Report Card
+          <span>🎓</span>
+          <span>Generate Student Report Card</span>
         </button>
       </div>
 
@@ -243,9 +245,6 @@ import { Exam, ExamResult, StudentReportCard, Student } from '../../core/models/
     .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
     .w-24 { width: 6rem; }
     .text-center { text-align: center; }
-    .tab-bar { display: flex; border-bottom: 2px solid var(--slate-200); gap: 1rem; }
-    .tab-btn { padding: 0.75rem 1rem; font-size: 0.875rem; font-weight: 600; color: var(--slate-600); background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; cursor: pointer; }
-    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
     .bg-primary-light { background-color: var(--primary-light); }
     .font-mono { font-family: monospace; }
   `]

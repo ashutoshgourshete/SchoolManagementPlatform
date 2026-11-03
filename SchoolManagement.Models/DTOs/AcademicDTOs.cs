@@ -58,6 +58,8 @@ public class CreateProgramDto
 public class ClassDto
 {
     public Guid Id { get; set; }
+    public Guid InstitutionId { get; set; }
+    public string? InstitutionName { get; set; }
     public Guid AcademicYearId { get; set; }
     public string AcademicYearName { get; set; } = string.Empty;
     public Guid? DepartmentId { get; set; }
@@ -74,6 +76,7 @@ public class ClassDto
 
 public class CreateClassDto
 {
+    public Guid? InstitutionId { get; set; }
     public Guid AcademicYearId { get; set; }
     public Guid? DepartmentId { get; set; }
     public Guid? ProgramId { get; set; }
@@ -85,6 +88,7 @@ public class CreateClassDto
 public class ClassSectionDto
 {
     public Guid Id { get; set; }
+    public Guid InstitutionId { get; set; }
     public Guid ClassId { get; set; }
     public string ClassName { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;

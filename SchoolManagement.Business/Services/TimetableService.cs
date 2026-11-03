@@ -195,7 +195,7 @@ public class TimetableService : ITimetableService
         Guid classSectionId,
         CancellationToken cancellationToken = default)
     {
-        var section = await _context.ClassSections
+        var section = await _context.ClassSections.IgnoreQueryFilters()
             .Include(cs => cs.Class)
             .FirstOrDefaultAsync(cs => cs.Id == classSectionId, cancellationToken);
 
@@ -204,7 +204,7 @@ public class TimetableService : ITimetableService
             return ApiResponse<WeeklyTimetableDto>.Fail("Class section not found.");
         }
 
-        var slots = await _context.Timetables
+        var slots = await _context.Timetables.IgnoreQueryFilters()
             .Include(t => t.CourseOffering)
                 .ThenInclude(co => co.Subject)
             .Include(t => t.CourseOffering)
@@ -267,7 +267,7 @@ public class TimetableService : ITimetableService
             return ApiResponse<TeacherWeeklyTimetableDto>.Fail("Teacher not found.");
         }
 
-        var slots = await _context.Timetables
+        var slots = await _context.Timetables.IgnoreQueryFilters()
             .Include(t => t.CourseOffering)
                 .ThenInclude(co => co.Subject)
             .Include(t => t.CourseOffering)

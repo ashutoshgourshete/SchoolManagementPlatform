@@ -9,11 +9,11 @@ import { AttendanceRecord, ClassModel } from '../../core/models/models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="page-container">
-      <div class="flex items-center justify-between mb-6">
+    <div>
+      <div class="flex items-center justify-between mb-5">
         <div>
-          <h1 class="text-2xl font-bold text-slate-900">Daily Attendance Entry</h1>
-          <p class="text-sm text-slate-500">Record and track daily classroom student presence</p>
+          <h1 class="text-2xl font-bold text-slate-900" style="letter-spacing: -0.3px;">Daily Attendance Register</h1>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Record and track real-time classroom student presence</p>
         </div>
       </div>
 

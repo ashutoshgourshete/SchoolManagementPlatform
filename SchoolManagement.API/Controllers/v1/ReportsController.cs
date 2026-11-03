@@ -35,7 +35,7 @@ public class ReportsController : ControllerBase
     }
 
     [HttpGet("financial")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> GetFinancialReport(
         [FromQuery] DateTime? startDate,
         [FromQuery] DateTime? endDate,
@@ -46,7 +46,7 @@ public class ReportsController : ControllerBase
     }
 
     [HttpGet("executive")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> GetExecutiveReport(CancellationToken cancellationToken)
     {
         var result = await _reportsService.GetExecutiveSummaryReportAsync(cancellationToken);

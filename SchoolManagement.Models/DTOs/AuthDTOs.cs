@@ -19,8 +19,10 @@ public class LoginResponseDto
     public UserRoleType Role { get; set; }
     public Guid? TenantId { get; set; }
     public string? TenantName { get; set; }
+    public string? TenantLogoUrl { get; set; }
     public Guid? InstitutionId { get; set; }
     public string? InstitutionName { get; set; }
+    public string? InstitutionLogoUrl { get; set; }
     public List<InstitutionSummaryDto> AvailableInstitutions { get; set; } = new();
 }
 
@@ -30,6 +32,7 @@ public class InstitutionSummaryDto
     public string Name { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public InstitutionType Type { get; set; }
+    public string? LogoUrl { get; set; }
     public UserRoleType Role { get; set; }
 }
 
@@ -37,6 +40,7 @@ public class RegisterTenantRequestDto
 {
     public string OrganizationName { get; set; } = string.Empty;
     public string TenantCode { get; set; } = string.Empty;
+    public string? LogoUrl { get; set; }
     public string InstitutionName { get; set; } = string.Empty;
     public InstitutionType InstitutionType { get; set; } = InstitutionType.School;
     public string AdminFirstName { get; set; } = string.Empty;
@@ -48,20 +52,31 @@ public class RegisterTenantRequestDto
     public Guid? SelectedPlanId { get; set; }
 }
 
+public enum ForgotPasswordMethod
+{
+    Email = 1,
+    Mobile = 2
+}
+
 public class ForgotPasswordRequestDto
 {
-    public string Email { get; set; } = string.Empty;
+    public string Identifier { get; set; } = string.Empty;
+    public string? Email { get; set; } // Backward compatibility
+    public ForgotPasswordMethod Method { get; set; } = ForgotPasswordMethod.Email;
 }
 
 public class ForgotPasswordResponseDto
 {
     public string Message { get; set; } = string.Empty;
     public string? ResetToken { get; set; }
+    public string? MaskedDestination { get; set; }
+    public string? ResolvedEmail { get; set; }
 }
 
 public class ResetPasswordRequestDto
 {
-    public string Email { get; set; } = string.Empty;
+    public string Identifier { get; set; } = string.Empty;
+    public string? Email { get; set; } // Backward compatibility
     public string Token { get; set; } = string.Empty;
     public string NewPassword { get; set; } = string.Empty;
 }

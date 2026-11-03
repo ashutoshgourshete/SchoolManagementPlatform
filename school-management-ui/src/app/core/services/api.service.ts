@@ -7,6 +7,7 @@ import {
   PagedResult,
   Student,
   Staff,
+  StaffHierarchyNode,
   AcademicYear,
   Department,
   Program,
@@ -92,6 +93,10 @@ export class ApiService {
     return this.http.post<ApiResponse<Staff>>(`${this.baseUrl}/staff`, payload);
   }
 
+  getStaffHierarchy(): Observable<ApiResponse<StaffHierarchyNode[]>> {
+    return this.http.get<ApiResponse<StaffHierarchyNode[]>>(`${this.baseUrl}/staff/hierarchy`);
+  }
+
   // Academics
   getAcademicYears(): Observable<ApiResponse<AcademicYear[]>> {
     return this.http.get<ApiResponse<AcademicYear[]>>(`${this.baseUrl}/academic/years`);
@@ -117,9 +122,10 @@ export class ApiService {
     return this.http.post<ApiResponse<Program>>(`${this.baseUrl}/academic/programs`, payload);
   }
 
-  getClasses(academicYearId?: string): Observable<ApiResponse<ClassModel[]>> {
+  getClasses(academicYearId?: string, institutionId?: string): Observable<ApiResponse<ClassModel[]>> {
     let params = new HttpParams();
     if (academicYearId) params = params.set('academicYearId', academicYearId);
+    if (institutionId) params = params.set('institutionId', institutionId);
     return this.http.get<ApiResponse<ClassModel[]>>(`${this.baseUrl}/academic/classes`, { params });
   }
 
@@ -127,8 +133,16 @@ export class ApiService {
     return this.http.post<ApiResponse<ClassModel>>(`${this.baseUrl}/academic/classes`, payload);
   }
 
+  deleteClass(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/academic/classes/${id}`);
+  }
+
   createSection(payload: any): Observable<ApiResponse<ClassSection>> {
     return this.http.post<ApiResponse<ClassSection>>(`${this.baseUrl}/academic/sections`, payload);
+  }
+
+  deleteSection(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/academic/sections/${id}`);
   }
 
   getSubjects(): Observable<ApiResponse<Subject[]>> {
@@ -189,8 +203,16 @@ export class ApiService {
     return this.http.post<ApiResponse<FeeStructure>>(`${this.baseUrl}/fees/structures`, payload);
   }
 
+  deleteFeeStructure(id: string): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/fees/structures/${id}`);
+  }
+
   assignFee(payload: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/fees/assign`, payload);
+  }
+
+  assignFeeToClass(payload: { classSectionId: string; feeStructureId: string; discountPercentage?: number }): Observable<ApiResponse<number>> {
+    return this.http.post<ApiResponse<number>>(`${this.baseUrl}/fees/assign-class`, payload);
   }
 
   getInvoices(pageIndex = 1, pageSize = 20, search?: string, studentId?: string): Observable<ApiResponse<PagedResult<StudentInvoice>>> {
@@ -223,6 +245,14 @@ export class ApiService {
 
   subscribePlan(payload: any): Observable<ApiResponse<TenantSubscription>> {
     return this.http.post<ApiResponse<TenantSubscription>>(`${this.baseUrl}/subscriptions/subscribe`, payload);
+  }
+
+  getTenantInstitutions(tenantId: string): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/tenants/${tenantId}/institutions`);
+  }
+
+  updateInstitution(institutionId: string, payload: any): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.baseUrl}/tenants/institutions/${institutionId}`, payload);
   }
 
   // Announcements

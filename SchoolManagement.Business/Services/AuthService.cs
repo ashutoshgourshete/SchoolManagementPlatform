@@ -64,7 +64,8 @@ public class AuthService : IAuthService
             Name = im.Institution?.Name ?? string.Empty,
             Code = im.Institution?.Code ?? string.Empty,
             Type = im.Institution?.Type ?? InstitutionType.School,
-            Role = im.Role
+            Role = im.Role,
+            LogoUrl = im.Institution?.LogoUrl
         }).ToList();
 
         var primaryRole = user.PrimaryRole;
@@ -95,8 +96,10 @@ public class AuthService : IAuthService
             Role = primaryRole,
             TenantId = primaryTenant?.Id,
             TenantName = primaryTenant?.Name,
+            TenantLogoUrl = primaryTenant?.LogoUrl,
             InstitutionId = primaryInstitution?.Id,
             InstitutionName = primaryInstitution?.Name,
+            InstitutionLogoUrl = primaryInstitution?.LogoUrl,
             AvailableInstitutions = availableInstitutions
         };
 
@@ -126,6 +129,7 @@ public class AuthService : IAuthService
         {
             Name = request.OrganizationName,
             Code = request.TenantCode.Trim().ToUpperInvariant(),
+            LogoUrl = request.LogoUrl,
             ContactEmail = request.AdminEmail,
             ContactPhone = request.ContactPhone,
             CurrencyCode = string.IsNullOrWhiteSpace(request.CurrencyCode) ? "INR" : request.CurrencyCode,
@@ -164,6 +168,7 @@ public class AuthService : IAuthService
             Type = request.InstitutionType,
             ContactEmail = request.AdminEmail,
             ContactPhone = request.ContactPhone,
+            LogoUrl = request.LogoUrl,
             IsActive = true
         };
         await _context.Institutions.AddAsync(institution, cancellationToken);
@@ -255,8 +260,10 @@ public class AuthService : IAuthService
             Role = UserRoleType.InstitutionAdmin,
             TenantId = tenant.Id,
             TenantName = tenant.Name,
+            TenantLogoUrl = tenant.LogoUrl,
             InstitutionId = institution.Id,
             InstitutionName = institution.Name,
+            InstitutionLogoUrl = institution.LogoUrl,
             AvailableInstitutions = new List<InstitutionSummaryDto>
             {
                 new()
@@ -265,7 +272,8 @@ public class AuthService : IAuthService
                     Name = institution.Name,
                     Code = institution.Code,
                     Type = institution.Type,
-                    Role = UserRoleType.InstitutionAdmin
+                    Role = UserRoleType.InstitutionAdmin,
+                    LogoUrl = institution.LogoUrl
                 }
             }
         };
@@ -324,43 +332,169 @@ public class AuthService : IAuthService
 
     public async Task<ApiResponse<ForgotPasswordResponseDto>> ForgotPasswordAsync(ForgotPasswordRequestDto request, CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email.Trim());
+        var rawIdentifier = !string.IsNullOrWhiteSpace(request.Identifier) ? request.Identifier.Trim() : (request.Email?.Trim() ?? string.Empty);
+        if (string.IsNullOrWhiteSpace(rawIdentifier))
+        {
+            return ApiResponse<ForgotPasswordResponseDto>.Fail("Please provide a registered email or mobile number.");
+        }
+
+        var isEmail = request.Method == ForgotPasswordMethod.Email || rawIdentifier.Contains('@');
+        ApplicationUser? user = null;
+
+        if (isEmail)
+        {
+            user = await _userManager.FindByEmailAsync(rawIdentifier);
+            if (user == null)
+            {
+                var guardian = await _context.Guardians
+                    .Include(g => g.User)
+                    .FirstOrDefaultAsync(g => g.Email.ToLower() == rawIdentifier.ToLower(), cancellationToken);
+                user = guardian?.User;
+            }
+            if (user == null)
+            {
+                var staff = await _context.StaffMembers
+                    .Include(s => s.User)
+                    .FirstOrDefaultAsync(s => s.Email.ToLower() == rawIdentifier.ToLower(), cancellationToken);
+                user = staff?.User;
+            }
+        }
+        else
+        {
+            // Clean phone digits for matching
+            var phoneDigits = new string(rawIdentifier.Where(char.IsDigit).ToArray());
+            if (phoneDigits.Length >= 10)
+            {
+                phoneDigits = phoneDigits.Substring(phoneDigits.Length - 10);
+            }
+
+            user = await _context.Users
+                .FirstOrDefaultAsync(u => u.PhoneNumber != null && u.PhoneNumber.Contains(phoneDigits), cancellationToken);
+
+            if (user == null)
+            {
+                var guardian = await _context.Guardians
+                    .Include(g => g.User)
+                    .FirstOrDefaultAsync(g => g.Phone.Contains(phoneDigits), cancellationToken);
+                user = guardian?.User;
+            }
+
+            if (user == null)
+            {
+                var staff = await _context.StaffMembers
+                    .Include(s => s.User)
+                    .FirstOrDefaultAsync(s => s.Phone.Contains(phoneDigits), cancellationToken);
+                user = staff?.User;
+            }
+        }
+
         if (user == null || !user.IsActive)
         {
             // For security, do not reveal whether user exists
             return ApiResponse<ForgotPasswordResponseDto>.Ok(new ForgotPasswordResponseDto
             {
-                Message = "If an account with that email exists, password reset instructions have been generated."
+                Message = isEmail 
+                    ? "If an account with that email exists, password reset instructions have been generated."
+                    : "If an account with that mobile number exists, an OTP has been dispatched."
             });
         }
 
+        // Generate Identity reset token
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-        // Record notification log
-        await _context.NotificationLogs.AddAsync(new NotificationLog
+        string channel;
+        string recipient;
+        string masked;
+
+        if (isEmail)
         {
-            Recipient = user.Email ?? string.Empty,
-            Channel = "Email",
-            Subject = "Password Reset Request",
-            Message = $"Password reset token: {token}",
-            Status = "Sent",
-            SentAtUtc = DateTime.UtcNow
-        }, cancellationToken);
+            channel = "Email";
+            recipient = user.Email ?? rawIdentifier;
+            masked = MaskEmail(recipient);
+
+            await _context.NotificationLogs.AddAsync(new NotificationLog
+            {
+                Recipient = recipient,
+                Channel = channel,
+                Subject = "Password Reset Request",
+                Message = $"Your password reset token is: {token}",
+                Status = "Sent",
+                SentAtUtc = DateTime.UtcNow
+            }, cancellationToken);
+        }
+        else
+        {
+            channel = "SMS";
+            recipient = user.PhoneNumber ?? rawIdentifier;
+            masked = MaskPhone(recipient);
+
+            await _context.NotificationLogs.AddAsync(new NotificationLog
+            {
+                Recipient = recipient,
+                Channel = channel,
+                Subject = "Password Reset Token / OTP",
+                Message = $"Your EduManage reset verification code is: {token}",
+                Status = "Sent",
+                SentAtUtc = DateTime.UtcNow
+            }, cancellationToken);
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return ApiResponse<ForgotPasswordResponseDto>.Ok(new ForgotPasswordResponseDto
         {
-            Message = "Password reset instructions have been generated.",
-            ResetToken = token // Provided for easy development / demo testing
+            Message = $"Verification instructions dispatched to {masked}.",
+            ResetToken = token, // Provided for easy development / demo testing
+            MaskedDestination = masked,
+            ResolvedEmail = user.Email
         });
     }
 
     public async Task<ApiResponse<bool>> ResetPasswordAsync(ResetPasswordRequestDto request, CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email.Trim());
+        var rawIdentifier = !string.IsNullOrWhiteSpace(request.Identifier) ? request.Identifier.Trim() : (request.Email?.Trim() ?? string.Empty);
+        if (string.IsNullOrWhiteSpace(rawIdentifier))
+        {
+            return ApiResponse<bool>.Fail("Invalid password reset request: missing identifier.");
+        }
+
+        var isEmail = rawIdentifier.Contains('@');
+        ApplicationUser? user = null;
+
+        if (isEmail)
+        {
+            user = await _userManager.FindByEmailAsync(rawIdentifier);
+            if (user == null)
+            {
+                var guardian = await _context.Guardians
+                    .Include(g => g.User)
+                    .FirstOrDefaultAsync(g => g.Email.ToLower() == rawIdentifier.ToLower(), cancellationToken);
+                user = guardian?.User;
+            }
+        }
+        else
+        {
+            var phoneDigits = new string(rawIdentifier.Where(char.IsDigit).ToArray());
+            if (phoneDigits.Length >= 10)
+            {
+                phoneDigits = phoneDigits.Substring(phoneDigits.Length - 10);
+            }
+
+            user = await _context.Users
+                .FirstOrDefaultAsync(u => u.PhoneNumber != null && u.PhoneNumber.Contains(phoneDigits), cancellationToken);
+
+            if (user == null)
+            {
+                var guardian = await _context.Guardians
+                    .Include(g => g.User)
+                    .FirstOrDefaultAsync(g => g.Phone.Contains(phoneDigits), cancellationToken);
+                user = guardian?.User;
+            }
+        }
+
         if (user == null)
         {
-            return ApiResponse<bool>.Fail("Invalid password reset request.");
+            return ApiResponse<bool>.Fail("Invalid password reset request: user not found.");
         }
 
         var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
@@ -370,5 +504,23 @@ public class AuthService : IAuthService
         }
 
         return ApiResponse<bool>.Ok(true, "Password has been reset successfully. You can now log in with your new password.");
+    }
+
+    private static string MaskEmail(string email)
+    {
+        var parts = email.Split('@');
+        if (parts.Length != 2) return email;
+        var name = parts[0];
+        var domain = parts[1];
+        if (name.Length <= 2) return $"{name[0]}*@{domain}";
+        return $"{name[0]}***{name[^1]}@{domain}";
+    }
+
+    private static string MaskPhone(string phone)
+    {
+        var digits = new string(phone.Where(char.IsDigit).ToArray());
+        if (digits.Length < 4) return phone;
+        var last4 = digits.Substring(digits.Length - 4);
+        return $"******{last4}";
     }
 }

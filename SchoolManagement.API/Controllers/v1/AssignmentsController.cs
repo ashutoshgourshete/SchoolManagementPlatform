@@ -37,7 +37,7 @@ public class AssignmentsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateAssignment(
         [FromBody] CreateAssignmentDto dto,
         CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ public class AssignmentsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> DeleteAssignment(Guid id, CancellationToken cancellationToken)
     {
         var result = await _assignmentService.DeleteAssignmentAsync(id, cancellationToken);
@@ -69,7 +69,7 @@ public class AssignmentsController : ControllerBase
     }
 
     [HttpGet("{id:guid}/submissions")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> GetAssignmentSubmissions(Guid id, CancellationToken cancellationToken)
     {
         var result = await _assignmentService.GetAssignmentSubmissionsAsync(id, cancellationToken);
@@ -78,7 +78,7 @@ public class AssignmentsController : ControllerBase
     }
 
     [HttpPost("submissions/grade")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Teacher,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> GradeSubmission(
         [FromBody] GradeSubmissionDto dto,
         CancellationToken cancellationToken)

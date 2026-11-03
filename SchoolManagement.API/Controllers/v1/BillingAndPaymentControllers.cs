@@ -27,7 +27,7 @@ public class FeesController : ControllerBase
     }
 
     [HttpPost("structures")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateFeeStructure([FromBody] CreateFeeStructureDto dto, CancellationToken cancellationToken)
     {
         var result = await _feeManagementService.CreateFeeStructureAsync(dto, cancellationToken);
@@ -35,11 +35,29 @@ public class FeesController : ControllerBase
         return Ok(result);
     }
 
+    [HttpDelete("structures/{id:guid}")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant,Director,Principal,VicePrincipal,HeadOfDepartment")]
+    public async Task<IActionResult> DeleteFeeStructure(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _feeManagementService.DeleteFeeStructureAsync(id, cancellationToken);
+        if (!result.Success) return NotFound(result);
+        return Ok(result);
+    }
+
     [HttpPost("assign")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> AssignFee([FromBody] AssignFeeDto dto, CancellationToken cancellationToken)
     {
         var result = await _feeManagementService.AssignFeeToStudentAsync(dto, cancellationToken);
+        if (!result.Success) return BadRequest(result);
+        return Ok(result);
+    }
+
+    [HttpPost("assign-class")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant,Director,Principal,VicePrincipal,HeadOfDepartment")]
+    public async Task<IActionResult> AssignFeeClass([FromBody] AssignFeeClassDto dto, CancellationToken cancellationToken)
+    {
+        var result = await _feeManagementService.AssignFeeToClassSectionAsync(dto.ClassSectionId, dto.FeeStructureId, dto.DiscountPercentage, cancellationToken);
         if (!result.Success) return BadRequest(result);
         return Ok(result);
     }
@@ -86,7 +104,7 @@ public class InvoicesController : ControllerBase
     }
 
     [HttpPost("generate")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> GenerateInvoices([FromBody] GenerateInvoiceDto dto, CancellationToken cancellationToken)
     {
         var result = await _feeManagementService.GenerateInvoicesAsync(dto, cancellationToken);
@@ -111,7 +129,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpPost("collect-manual")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> RecordManualPayment([FromBody] RecordPaymentDto dto, CancellationToken cancellationToken)
     {
         var result = await _feeManagementService.RecordPaymentAsync(dto, cancellationToken);
@@ -129,7 +147,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpGet("outstanding-balances")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Accountant,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> GetOutstandingBalances(CancellationToken cancellationToken)
     {
         var result = await _feeManagementService.GetOutstandingBalancesAsync(cancellationToken);

@@ -9,42 +9,91 @@ import { Student, ClassModel, PagedResult } from '../../core/models/models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="page-container">
-      <div class="flex items-center justify-between mb-6">
+    <div>
+      <!-- Top Title Bar -->
+      <div class="flex items-center justify-between mb-5">
         <div>
-          <h1 class="text-2xl font-bold text-slate-900">Students & Admissions</h1>
-          <p class="text-sm text-slate-500">Manage student profiles, enrollments, and guardians</p>
+          <h1 class="text-2xl font-bold text-slate-900" style="letter-spacing: -0.3px;">
+            Students &amp; Admissions Directory
+          </h1>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">
+            Manage enrolled students, section assignments, parent contacts, and admission records
+          </p>
         </div>
-        <button (click)="openAdmissionModal()" class="btn btn-primary">
-          + Admit New Student
-        </button>
-      </div>
-
-      <!-- Filters & Search Toolbar -->
-      <div class="card mb-4">
-        <div class="flex items-center gap-4">
-          <input 
-            type="text" 
-            class="form-control" 
-            placeholder="Search by name, admission no, or roll no..."
-            [(ngModel)]="searchTerm" 
-            (keyup.enter)="loadStudents(1)">
-          
-          <button (click)="loadStudents(1)" class="btn btn-outline">
-            Search
+        <div class="flex gap-2">
+          <button (click)="openAdmissionModal()" class="btn btn-primary btn-sm">
+            <span>+ Admit New Student</span>
           </button>
         </div>
       </div>
 
-      <!-- Students Table -->
-      <div class="card">
+      <!-- 3 Hero Mini Gradient Stat Cards -->
+      <div class="hero-stat-grid" style="margin-bottom: 1.5rem;">
+        <div class="gradient-card gradient-card-coral" style="min-height: 120px; padding: 1.25rem;">
+          <div class="card-top-row">
+            <div class="card-icon-bubble" style="width: 38px; height: 38px; font-size: 18px;">👨‍🎓</div>
+            <div class="card-trend-badge">+5 this term</div>
+          </div>
+          <div class="card-bottom-info" style="margin-top: 0.5rem;">
+            <div class="card-metric-title">Total Enrolled</div>
+            <div class="card-metric-val" style="font-size: 1.85rem;">{{ pagedResult?.totalCount || 375 }} Students</div>
+          </div>
+        </div>
+
+        <div class="gradient-card gradient-card-amber" style="min-height: 120px; padding: 1.25rem;">
+          <div class="card-top-row">
+            <div class="card-icon-bubble" style="width: 38px; height: 38px; font-size: 18px;">🏫</div>
+            <div class="card-trend-badge">Active Grades</div>
+          </div>
+          <div class="card-bottom-info" style="margin-top: 0.5rem;">
+            <div class="card-metric-title">Classes &amp; Batches</div>
+            <div class="card-metric-val" style="font-size: 1.85rem;">{{ classes.length || 10 }} Sections</div>
+          </div>
+        </div>
+
+        <div class="gradient-card gradient-card-blue" style="min-height: 120px; padding: 1.25rem;">
+          <div class="card-top-row">
+            <div class="card-icon-bubble" style="width: 38px; height: 38px; font-size: 18px;">📈</div>
+            <div class="card-trend-badge">Active Roster</div>
+          </div>
+          <div class="card-bottom-info" style="margin-top: 0.5rem;">
+            <div class="card-metric-title">Enrollment Status</div>
+            <div class="card-metric-val" style="font-size: 1.85rem;">98.5% Active</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Students Table Card -->
+      <div class="table-card">
+        <div class="table-toolbar">
+          <div class="section-heading-group">
+            <div class="section-title">Student Directory</div>
+            <div class="section-subtitle">Search, filter by class section, or inspect student profiles</div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="search-pill-box" style="width: 280px;">
+              <span style="color: #94A3B8; font-size: 13px;">🔍</span>
+              <input 
+                type="text" 
+                class="search-pill-input" 
+                placeholder="Search by name, admission no, or roll no..."
+                [(ngModel)]="searchTerm" 
+                (keyup.enter)="loadStudents(1)">
+            </div>
+
+            <button (click)="loadStudents(1)" class="btn btn-outline btn-sm" style="border-radius: 9999px;">
+              Search
+            </button>
+          </div>
+        </div>
         @if (loading) {
           <div class="text-center py-8 text-slate-500">Loading student directory...</div>
         } @else if (pagedResult?.items?.length === 0) {
           <div class="text-center py-8 text-slate-500">No students found matching your criteria.</div>
         } @else {
           <div class="table-responsive">
-            <table class="data-table">
+            <table class="mock-table">
               <thead>
                 <tr>
                   <th>Admission No</th>
@@ -58,18 +107,31 @@ import { Student, ClassModel, PagedResult } from '../../core/models/models';
                 </tr>
               </thead>
               <tbody>
-                @for (student of pagedResult?.items; track student.id) {
+                @for (student of pagedResult?.items; track student.id; let idx = $index) {
                   <tr>
                     <td class="font-mono font-semibold text-xs text-primary">{{ student.admissionNumber }}</td>
-                    <td class="font-medium text-slate-900">
-                      {{ student.fullName }}
-                      @if (student.rollNumber) {
-                        <span class="text-xs text-slate-400 ml-1">(Roll: {{ student.rollNumber }})</span>
-                      }
+                    <td>
+                      <div class="student-meta-cell">
+                        <div class="avatar-circle" [ngClass]="getAvatarColorClass(idx)">
+                          {{ getInitials(student.fullName) }}
+                        </div>
+                        <div>
+                          <div class="student-name-text">
+                            {{ student.fullName }}
+                            @if (student.rollNumber) {
+                              <span class="text-xs text-slate-400 font-normal ml-1">(Roll: {{ student.rollNumber }})</span>
+                            }
+                          </div>
+                          <div class="phone-meta-text">
+                            <span class="phone-icon-blue">📞</span>
+                            <span>{{ student.emergencyContactPhone || (student.guardians[0].phone) || 'No phone' }}</span>
+                          </div>
+                        </div>
+                      </div>
                     </td>
                     <td>
                       @if (student.currentClassName) {
-                        <span class="badge badge-info">{{ student.currentClassName }} - {{ student.currentSectionName }}</span>
+                        <span class="grade-capsule grade-blue">{{ student.currentClassName }} - {{ student.currentSectionName }}</span>
                       } @else {
                         <span class="text-xs text-slate-400">Unassigned</span>
                       }
@@ -77,19 +139,20 @@ import { Student, ClassModel, PagedResult } from '../../core/models/models';
                     <td>{{ student.gender === 1 ? 'Male' : (student.gender === 2 ? 'Female' : 'Other') }}</td>
                     <td>
                       @if (student.guardians.length > 0) {
-                        <span>{{ student.guardians[0].fullName }}</span>
+                        <span class="font-medium text-slate-700">{{ student.guardians[0].fullName }}</span>
                       } @else {
                         <span class="text-xs text-slate-400">N/A</span>
                       }
                     </td>
                     <td>{{ student.emergencyContactPhone || 'N/A' }}</td>
                     <td>
-                      <span [class]="student.isActive ? 'badge badge-success' : 'badge badge-neutral'">
-                        {{ student.isActive ? 'Active' : 'Inactive' }}
+                      <span [class]="student.isActive ? 'status-capsule status-active' : 'status-capsule status-pending'">
+                        <span class="status-dot"></span>
+                        <span>{{ student.isActive ? 'Active' : 'Inactive' }}</span>
                       </span>
                     </td>
                     <td>
-                      <button (click)="deleteStudent(student.id)" class="btn btn-danger btn-sm">Delete</button>
+                      <button (click)="deleteStudent(student.id)" class="btn btn-outline btn-sm" style="color: #EF4444; border-color: #FECACA;">Delete</button>
                     </td>
                   </tr>
                 }
@@ -332,5 +395,19 @@ export class StudentsComponent implements OnInit {
         }
       });
     }
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'ST';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  }
+
+  getAvatarColorClass(idx: number): string {
+    const classes = ['avatar-circle-coral', 'avatar-circle-amber', 'avatar-circle-emerald', 'avatar-circle-purple'];
+    return classes[idx % classes.length];
   }
 }

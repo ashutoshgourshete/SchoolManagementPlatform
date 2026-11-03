@@ -25,14 +25,17 @@ export interface LoginResponse {
   role: string | number;
   tenantId?: string;
   tenantName?: string;
+  tenantLogoUrl?: string;
   institutionId?: string;
   institutionName?: string;
+  institutionLogoUrl?: string;
   availableInstitutions: {
     institutionId: string;
     name: string;
     code: string;
     type: number;
     role: number;
+    logoUrl?: string;
   }[];
 }
 
@@ -86,6 +89,23 @@ export interface Staff {
   phone: string;
   joiningDate: string;
   isActive: boolean;
+  reportsToStaffId?: string;
+  reportsToName?: string;
+  reportsToDesignation?: string;
+  subordinatesCount?: number;
+}
+
+export interface StaffHierarchyNode {
+  id: string;
+  employeeCode: string;
+  fullName: string;
+  designation: string;
+  departmentName?: string;
+  email: string;
+  phone: string;
+  reportsToStaffId?: string;
+  reportsToName?: string;
+  directReports?: StaffHierarchyNode[];
 }
 
 export interface AcademicYear {
@@ -117,6 +137,8 @@ export interface Program {
 
 export interface ClassModel {
   id: string;
+  institutionId?: string;
+  institutionName?: string;
   academicYearId: string;
   academicYearName: string;
   departmentId?: string;
@@ -131,6 +153,7 @@ export interface ClassModel {
 
 export interface ClassSection {
   id: string;
+  institutionId?: string;
   classId: string;
   className: string;
   name: string;

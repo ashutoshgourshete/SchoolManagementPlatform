@@ -47,7 +47,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateStudent([FromBody] CreateStudentDto dto, CancellationToken cancellationToken)
     {
         var result = await _studentService.CreateStudentAsync(dto, cancellationToken);
@@ -56,7 +56,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> UpdateStudent(Guid id, [FromBody] UpdateStudentDto dto, CancellationToken cancellationToken)
     {
         var result = await _studentService.UpdateStudentAsync(id, dto, cancellationToken);
@@ -65,7 +65,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> DeleteStudent(Guid id, CancellationToken cancellationToken)
     {
         var result = await _studentService.DeleteStudentAsync(id, cancellationToken);
@@ -74,7 +74,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpPost("enroll")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> EnrollStudent([FromBody] CreateEnrollmentDto dto, CancellationToken cancellationToken)
     {
         var result = await _studentService.EnrollStudentAsync(dto, cancellationToken);
@@ -114,6 +114,13 @@ public class StaffController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("hierarchy")]
+    public async Task<IActionResult> GetHierarchy(CancellationToken cancellationToken)
+    {
+        var result = await _staffService.GetHierarchyTreeAsync(cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetStaffById(Guid id, CancellationToken cancellationToken)
     {
@@ -123,7 +130,7 @@ public class StaffController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateStaff([FromBody] CreateStaffDto dto, CancellationToken cancellationToken)
     {
         var result = await _staffService.CreateStaffAsync(dto, cancellationToken);

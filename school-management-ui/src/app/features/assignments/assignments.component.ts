@@ -15,7 +15,7 @@ import {
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="page-container">
+    <div>
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
         <div>
@@ -32,24 +32,24 @@ import {
       <!-- Role / View Switcher -->
       <div class="card mb-6">
         <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <label class="text-xs font-bold text-slate-600 uppercase">View Mode:</label>
-            <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
+          <div class="view-mode-wrapper">
+            <span class="view-mode-label">View Mode:</span>
+            <div class="segmented-pill-group">
               <button 
+                type="button"
                 (click)="switchViewMode('teacher')" 
-                [class.bg-white]="viewMode === 'teacher'"
-                [class.shadow-sm]="viewMode === 'teacher'"
-                [class.font-bold]="viewMode === 'teacher'"
-                class="px-3.5 py-1.5 rounded-md transition-all text-slate-700">
-                👨‍🏫 Teacher Assignment Hub
+                [class.active]="viewMode === 'teacher'"
+                class="segmented-pill-btn">
+                <span>👨‍🏫</span>
+                <span>Teacher Assignment Hub</span>
               </button>
               <button 
+                type="button"
                 (click)="switchViewMode('student')" 
-                [class.bg-white]="viewMode === 'student'"
-                [class.shadow-sm]="viewMode === 'student'"
-                [class.font-bold]="viewMode === 'student'"
-                class="px-3.5 py-1.5 rounded-md transition-all text-slate-700">
-                👨‍🎓 Student Upload Portal
+                [class.active]="viewMode === 'student'"
+                class="segmented-pill-btn">
+                <span>👨‍🎓</span>
+                <span>Student Upload Portal</span>
               </button>
             </div>
           </div>

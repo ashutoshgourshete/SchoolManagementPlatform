@@ -9,6 +9,7 @@ public class Tenant : BaseEntity
     public string Name { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public string? Domain { get; set; }
+    public string? LogoUrl { get; set; }
     public TenantStatus Status { get; set; } = TenantStatus.Active;
     public string ContactEmail { get; set; } = string.Empty;
     public string? ContactPhone { get; set; }

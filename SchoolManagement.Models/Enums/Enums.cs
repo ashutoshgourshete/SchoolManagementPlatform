@@ -101,7 +101,11 @@ public enum UserRoleType
     Teacher = 3,
     Accountant = 4,
     Student = 5,
-    Parent = 6
+    Parent = 6,
+    Director = 7,
+    Principal = 8,
+    VicePrincipal = 9,
+    HeadOfDepartment = 10
 }
 
 public enum SubmissionStatus

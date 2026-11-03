@@ -68,7 +68,11 @@ public class StaffService : IStaffService
                 Email = s.Email,
                 Phone = s.Phone,
                 JoiningDate = s.JoiningDate,
-                IsActive = s.IsActive
+                IsActive = s.IsActive,
+                ReportsToStaffId = s.ReportsToStaffId,
+                ReportsToName = s.ReportsToStaff != null ? s.ReportsToStaff.FirstName + " " + s.ReportsToStaff.LastName : null,
+                ReportsToDesignation = s.ReportsToStaff != null ? s.ReportsToStaff.Designation : null,
+                SubordinatesCount = s.DirectReports.Count
             })
             .ToListAsync(cancellationToken);
 
@@ -79,6 +83,8 @@ public class StaffService : IStaffService
     {
         var s = await _context.StaffMembers
             .Include(s => s.Department)
+            .Include(s => s.ReportsToStaff)
+            .Include(s => s.DirectReports)
             .FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted, cancellationToken);
 
         if (s == null) return ApiResponse<StaffDto>.Fail("Staff member not found");
@@ -96,7 +102,11 @@ public class StaffService : IStaffService
             Email = s.Email,
             Phone = s.Phone,
             JoiningDate = s.JoiningDate,
-            IsActive = s.IsActive
+            IsActive = s.IsActive,
+            ReportsToStaffId = s.ReportsToStaffId,
+            ReportsToName = s.ReportsToStaff != null ? $"{s.ReportsToStaff.FirstName} {s.ReportsToStaff.LastName}".Trim() : null,
+            ReportsToDesignation = s.ReportsToStaff?.Designation,
+            SubordinatesCount = s.DirectReports.Count
         });
     }
 
@@ -172,6 +182,7 @@ public class StaffService : IStaffService
             Email = dto.Email.Trim(),
             Phone = dto.Phone.Trim(),
             JoiningDate = dto.JoiningDate,
+            ReportsToStaffId = dto.ReportsToStaffId,
             IsActive = true
         };
 
@@ -179,5 +190,55 @@ public class StaffService : IStaffService
         await _context.SaveChangesAsync(cancellationToken);
 
         return await GetStaffByIdAsync(staff.Id, cancellationToken);
+    }
+
+    public async Task<ApiResponse<List<StaffHierarchyDto>>> GetHierarchyTreeAsync(CancellationToken cancellationToken = default)
+    {
+        var staffList = await _context.StaffMembers
+            .Include(s => s.Department)
+            .Include(s => s.ReportsToStaff)
+            .Where(s => !s.IsDeleted && s.IsActive)
+            .OrderBy(s => s.FirstName)
+            .Select(s => new StaffHierarchyDto
+            {
+                Id = s.Id,
+                EmployeeCode = s.EmployeeCode,
+                FullName = (s.FirstName + " " + s.LastName).Trim(),
+                Designation = s.Designation,
+                DepartmentName = s.Department != null ? s.Department.Name : null,
+                Email = s.Email,
+                Phone = s.Phone,
+                ReportsToStaffId = s.ReportsToStaffId,
+                ReportsToName = s.ReportsToStaff != null ? (s.ReportsToStaff.FirstName + " " + s.ReportsToStaff.LastName).Trim() : null
+            })
+            .ToListAsync(cancellationToken);
+
+        var lookup = staffList.ToLookup(s => s.ReportsToStaffId);
+        foreach (var member in staffList)
+        {
+            member.DirectReports = lookup[member.Id].ToList();
+        }
+
+        // Roots are staff members who do not report to anyone, or whose supervisor is not in the active staff list
+        var staffIds = staffList.Select(s => s.Id).ToHashSet();
+        var roots = staffList
+            .Where(s => !s.ReportsToStaffId.HasValue || !staffIds.Contains(s.ReportsToStaffId.Value))
+            .ToList();
+
+        // Sort roots: Director first, then Principal, etc.
+        roots = roots.OrderBy(r => GetRolePriority(r.Designation)).ToList();
+
+        return ApiResponse<List<StaffHierarchyDto>>.Ok(roots);
+    }
+
+    private static int GetRolePriority(string designation)
+    {
+        var d = designation.ToLowerInvariant();
+        if (d.Contains("director")) return 1;
+        if (d.Contains("vice") && d.Contains("principal")) return 3;
+        if (d.Contains("principal")) return 2;
+        if (d.Contains("head") || d.Contains("hod")) return 4;
+        if (d.Contains("teacher") || d.Contains("faculty")) return 5;
+        return 6;
     }
 }

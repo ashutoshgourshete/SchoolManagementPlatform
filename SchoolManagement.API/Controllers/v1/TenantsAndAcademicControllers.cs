@@ -61,6 +61,24 @@ public class TenantsController : ControllerBase
         if (!result.Success) return BadRequest(result);
         return Ok(result);
     }
+
+    [HttpPut("institutions/{institutionId:guid}")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal")]
+    public async Task<IActionResult> UpdateInstitution(Guid institutionId, [FromBody] UpdateInstitutionDto dto, CancellationToken cancellationToken)
+    {
+        var result = await _tenantService.UpdateInstitutionAsync(institutionId, dto, cancellationToken);
+        if (!result.Success) return BadRequest(result);
+        return Ok(result);
+    }
+
+    [HttpPatch("{id:guid}/logo")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    public async Task<IActionResult> UpdateTenantLogo(Guid id, [FromBody] string logoUrl, CancellationToken cancellationToken)
+    {
+        var result = await _tenantService.UpdateTenantLogoAsync(id, logoUrl, cancellationToken);
+        if (!result.Success) return BadRequest(result);
+        return Ok(result);
+    }
 }
 
 [ApiController]
@@ -84,7 +102,7 @@ public class AcademicController : ControllerBase
     }
 
     [HttpPost("years")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateAcademicYear([FromBody] CreateAcademicYearDto dto, CancellationToken cancellationToken)
     {
         var result = await _academicService.CreateAcademicYearAsync(dto, cancellationToken);
@@ -92,7 +110,7 @@ public class AcademicController : ControllerBase
     }
 
     [HttpPost("years/{id:guid}/set-current")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> SetCurrentAcademicYear(Guid id, CancellationToken cancellationToken)
     {
         var result = await _academicService.SetCurrentAcademicYearAsync(id, cancellationToken);
@@ -109,7 +127,7 @@ public class AcademicController : ControllerBase
     }
 
     [HttpPost("departments")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentDto dto, CancellationToken cancellationToken)
     {
         var result = await _academicService.CreateDepartmentAsync(dto, cancellationToken);
@@ -126,7 +144,7 @@ public class AcademicController : ControllerBase
     }
 
     [HttpPost("programs")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateProgram([FromBody] CreateProgramDto dto, CancellationToken cancellationToken)
     {
         var result = await _academicService.CreateProgramAsync(dto, cancellationToken);
@@ -136,17 +154,26 @@ public class AcademicController : ControllerBase
 
     // Classes & Sections
     [HttpGet("classes")]
-    public async Task<IActionResult> GetClasses([FromQuery] Guid? academicYearId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetClasses([FromQuery] Guid? academicYearId, [FromQuery] Guid? institutionId, CancellationToken cancellationToken)
     {
-        var result = await _academicService.GetClassesAsync(academicYearId, cancellationToken);
+        var result = await _academicService.GetClassesAsync(academicYearId, institutionId, cancellationToken);
         return Ok(result);
     }
 
     [HttpPost("classes")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateClass([FromBody] CreateClassDto dto, CancellationToken cancellationToken)
     {
         var result = await _academicService.CreateClassAsync(dto, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpDelete("classes/{id:guid}")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
+    public async Task<IActionResult> DeleteClass(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _academicService.DeleteClassAsync(id, cancellationToken);
+        if (!result.Success) return NotFound(result);
         return Ok(result);
     }
 
@@ -158,10 +185,19 @@ public class AcademicController : ControllerBase
     }
 
     [HttpPost("sections")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateSection([FromBody] CreateClassSectionDto dto, CancellationToken cancellationToken)
     {
         var result = await _academicService.CreateClassSectionAsync(dto, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpDelete("sections/{id:guid}")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
+    public async Task<IActionResult> DeleteSection(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _academicService.DeleteClassSectionAsync(id, cancellationToken);
+        if (!result.Success) return NotFound(result);
         return Ok(result);
     }
 
@@ -174,7 +210,7 @@ public class AcademicController : ControllerBase
     }
 
     [HttpPost("subjects")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateSubject([FromBody] CreateSubjectDto dto, CancellationToken cancellationToken)
     {
         var result = await _academicService.CreateSubjectAsync(dto, cancellationToken);
@@ -190,7 +226,7 @@ public class AcademicController : ControllerBase
     }
 
     [HttpPost("course-offerings")]
-    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin")]
+    [Authorize(Roles = "PlatformAdmin,InstitutionAdmin,Director,Principal,VicePrincipal,HeadOfDepartment")]
     public async Task<IActionResult> CreateCourseOffering([FromBody] CreateCourseOfferingDto dto, CancellationToken cancellationToken)
     {
         var result = await _academicService.CreateCourseOfferingAsync(dto, cancellationToken);
