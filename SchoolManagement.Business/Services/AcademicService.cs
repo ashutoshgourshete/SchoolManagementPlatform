@@ -1,3 +1,4 @@
+using SchoolManagement.Data.Services;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Business.Interfaces;
 using SchoolManagement.Data;
@@ -10,10 +11,12 @@ namespace SchoolManagement.Business.Services;
 public class AcademicService : IAcademicService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ICurrentTenantService _currentTenantService;
 
-    public AcademicService(ApplicationDbContext context)
+    public AcademicService(ApplicationDbContext context, ICurrentTenantService currentTenantService)
     {
         _context = context;
+        _currentTenantService = currentTenantService;
     }
 
     public async Task<ApiResponse<List<AcademicYearDto>>> GetAcademicYearsAsync(CancellationToken cancellationToken = default)
@@ -181,7 +184,7 @@ public class AcademicService : IAcademicService
         }, "Program created successfully");
     }
 
-    public async Task<ApiResponse<List<ClassDto>>> GetClassesAsync(Guid? academicYearId = null, CancellationToken cancellationToken = default)
+    public async Task<ApiResponse<List<ClassDto>>> GetClassesAsync(Guid? academicYearId = null, Guid? institutionId = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Classes
             .Include(c => c.AcademicYear)
@@ -194,6 +197,11 @@ public class AcademicService : IAcademicService
         if (academicYearId.HasValue)
         {
             query = query.Where(c => c.AcademicYearId == academicYearId.Value);
+        }
+
+        if (institutionId.HasValue && institutionId.Value != Guid.Empty)
+        {
+            query = query.Where(c => c.InstitutionId == institutionId.Value);
         }
 
         var classes = await query
@@ -320,6 +328,37 @@ public class AcademicService : IAcademicService
             RoomNumber = section.RoomNumber,
             ClassTeacherId = section.ClassTeacherId
         }, "Section created successfully");
+    }
+
+    
+    public async Task<ApiResponse<bool>> DeleteClassAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var cls = await _context.Classes
+            .Include(c => c.Sections)
+            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+
+        if (cls == null)
+            return ApiResponse<bool>.Fail("Class not found.");
+
+        cls.IsDeleted = true;
+        foreach (var sec in cls.Sections)
+        {
+            sec.IsDeleted = true;
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+        return ApiResponse<bool>.Ok(true, "Class deleted successfully.");
+    }
+
+    public async Task<ApiResponse<bool>> DeleteClassSectionAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var sec = await _context.ClassSections.FindAsync(new object[] { id }, cancellationToken);
+        if (sec == null)
+            return ApiResponse<bool>.Fail("Class section not found.");
+
+        sec.IsDeleted = true;
+        await _context.SaveChangesAsync(cancellationToken);
+        return ApiResponse<bool>.Ok(true, "Class section deleted successfully.");
     }
 
     public async Task<ApiResponse<List<SubjectDto>>> GetSubjectsAsync(CancellationToken cancellationToken = default)
