@@ -20,6 +20,24 @@ export class AuthService {
   tenantName = computed(() => this.currentUser()?.tenantName || 'Platform');
   institutionName = computed(() => this.currentUser()?.institutionName || 'Main Institution');
   tenantLogoUrl = computed(() => this.currentUser()?.tenantLogoUrl || null);
+  customLogo = signal<string | null>(typeof window !== 'undefined' ? localStorage.getItem('institution_custom_logo') : null);
+  isLogoModalOpen = signal<boolean>(false);
+
+  openLogoModal(): void {
+    this.isLogoModalOpen.set(true);
+  }
+
+  closeLogoModal(): void {
+    this.isLogoModalOpen.set(false);
+  }
+
+  removeCustomLogo(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('institution_custom_logo');
+    }
+    this.customLogo.set(null);
+  }
+
   institutionLogoUrl = computed(() => {
     const user = this.currentUser();
     if (!user) return null;
@@ -96,6 +114,18 @@ export class AuthService {
       this.setSession(updated);
       window.location.reload();
     }
+  }
+
+  setCustomLogo(logoUrl: string): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('institution_custom_logo', logoUrl);
+    }
+    this.customLogo.set(logoUrl);
+    this.updateCurrentInstitutionLogo(logoUrl);
+  }
+
+  getEffectiveLogo(): string | null {
+    return this.customLogo() || (typeof window !== 'undefined' ? localStorage.getItem('institution_custom_logo') : null) || this.institutionLogoUrl() || this.tenantLogoUrl() || null;
   }
 
   updateCurrentInstitutionLogo(logoUrl: string): void {

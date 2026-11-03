@@ -237,57 +237,7 @@ import { DashboardAnalytics } from '../../core/models/models';
         </div>
       </div>
 
-      <!-- Update Logo Modal Dialog -->
-      @if (showLogoModal) {
-        <div class="modal-overlay">
-          <div class="modal-content" style="max-width: 480px;">
-            <div class="card-header" style="margin-bottom: 1rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 12px;">
-              <div>
-                <h3 style="font-size: 16px; font-weight: 700; color: #0F172A; margin: 0;">📷 Update Institution Logo</h3>
-                <span style="font-size: 12px; color: #64748B;">Enter your official logo image URL or asset path</span>
-              </div>
-              <button (click)="closeLogoModal()" style="border: none; background: transparent; font-size: 18px; cursor: pointer; color: #94A3B8;">✕</button>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 16px;">
-              <label class="form-label" style="font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; display: block;">
-                Logo Image URL or Local Path *
-              </label>
-              <input 
-                type="text" 
-                class="form-control" 
-                [(ngModel)]="logoUrlInput" 
-                placeholder="https://example.com/logo.png or assets/logo.png"
-                style="padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box;">
-              <p style="font-size: 11px; color: #64748B; margin-top: 6px;">
-                💡 Tip: You can paste any online image URL or place an image in <code style="background: #F1F5F9; padding: 2px 4px; border-radius: 4px;">src/assets/logo.png</code>
-              </p>
-            </div>
-
-            @if (logoUrlInput) {
-              <div style="text-align: center; margin-bottom: 18px; padding: 14px; background: #F8FAFC; border-radius: 12px; border: 1px dashed #CBD5E1;">
-                <div style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 8px;">Logo Preview</div>
-                <img [src]="logoUrlInput" alt="Logo Preview" style="max-height: 60px; max-width: 160px; object-fit: contain; margin: 0 auto; display: block;" (error)="onImgError($event)">
-              </div>
-            }
-
-            @if (logoMessage) {
-              <div class="alert alert-success" style="font-size: 12px; padding: 8px 12px; margin-bottom: 14px;">
-                {{ logoMessage }}
-              </div>
-            }
-
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-              <button (click)="closeLogoModal()" class="btn btn-outline btn-sm">
-                Cancel
-              </button>
-              <button (click)="saveLogo()" class="btn btn-primary btn-sm" [disabled]="!logoUrlInput.trim()">
-                Save Logo
-              </button>
-            </div>
-          </div>
-        </div>
-      }
+      
     </div>
   `,
   styles: [`
@@ -356,22 +306,7 @@ export class DashboardComponent implements OnInit {
   }
 
   openLogoModal(): void {
-    this.showLogoModal = true;
-    this.logoMessage = '';
-  }
-
-  closeLogoModal(): void {
-    this.showLogoModal = false;
-  }
-
-  saveLogo(): void {
-    if (!this.logoUrlInput.trim()) return;
-    localStorage.setItem('institution_custom_logo', this.logoUrlInput.trim());
-    this.logoMessage = 'Logo saved successfully! It will now appear on your Navbar and Sidebar.';
-    setTimeout(() => {
-      this.closeLogoModal();
-      window.location.reload();
-    }, 1200);
+    this.authService.openLogoModal();
   }
 
   onImgError(event: any): void {

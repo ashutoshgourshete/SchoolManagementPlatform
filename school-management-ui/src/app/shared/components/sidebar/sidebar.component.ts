@@ -9,15 +9,18 @@ import { AuthService } from '../../../core/services/auth.service';
   imports: [CommonModule, RouterModule],
   template: `
     <aside class="sidebar">
-      <div class="sidebar-brand">
+      <div class="sidebar-brand" (click)="authService.openLogoModal()" style="cursor: pointer;" title="Click to upload or change institution logo">
         @if (getLogo()) {
           <img [src]="getLogo()" alt="Logo" style="width: 38px; height: 38px; object-fit: contain; border-radius: 10px; background: white; padding: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" />
         } @else {
-          <div class="brand-logo">🎓</div>
+          <div class="brand-logo" style="width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 20px;">🎓</div>
         }
-        <div>
-          <div class="brand-title">EduManage Cloud</div>
-          <div class="brand-subtitle">{{ authService.tenantName() }}</div>
+        <div style="flex: 1; min-width: 0;">
+          <div class="brand-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ authService.institutionName() || 'EduManage Cloud' }}</div>
+          <div class="brand-subtitle" style="display: flex; align-items: center; gap: 4px;">
+            <span>{{ authService.tenantName() }}</span>
+            <span style="font-size: 10px; color: #38BDF8;" title="Change logo">📷</span>
+          </div>
         </div>
       </div>
 
@@ -121,6 +124,10 @@ import { AuthService } from '../../../core/services/auth.service';
       align-items: center;
       gap: 0.85rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: background-color 0.15s ease;
+    }
+    .sidebar-brand:hover {
+      background: rgba(255, 255, 255, 0.05);
     }
     .brand-logo {
       font-size: 1.85rem;
@@ -180,6 +187,6 @@ export class SidebarComponent {
   constructor(public authService: AuthService) {}
 
   getLogo(): string | null {
-    return localStorage.getItem('institution_custom_logo') || null;
+    return this.authService.getEffectiveLogo();
   }
 }
