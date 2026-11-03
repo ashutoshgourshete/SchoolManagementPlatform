@@ -330,6 +330,12 @@ export class TimetablesComponent implements OnInit {
 
   constructor(private api: ApiService) {}
 
+  formatSecName(name: string): string {
+    if (!name) return '';
+    const cleaned = name.replace(/\bsection\b/gi, '').trim();
+    return cleaned ? 'Section ' + cleaned : name;
+  }
+
   ngOnInit(): void {
     this.loadInitialData();
   }
