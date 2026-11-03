@@ -135,6 +135,6 @@ public class StaffController : ControllerBase
     {
         var result = await _staffService.CreateStaffAsync(dto, cancellationToken);
         if (!result.Success) return BadRequest(result);
-        return CreatedAtAction(nameof(GetStaffById), new { id = result.Data!.Id }, result);
+        return Ok(result);
     }
 }

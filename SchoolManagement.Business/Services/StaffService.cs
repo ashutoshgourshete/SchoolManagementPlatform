@@ -82,6 +82,7 @@ public class StaffService : IStaffService
     public async Task<ApiResponse<StaffDto>> GetStaffByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var s = await _context.StaffMembers
+            .IgnoreQueryFilters()
             .Include(s => s.Department)
             .Include(s => s.ReportsToStaff)
             .Include(s => s.DirectReports)
@@ -112,77 +113,129 @@ public class StaffService : IStaffService
 
     public async Task<ApiResponse<StaffDto>> CreateStaffAsync(CreateStaffDto dto, CancellationToken cancellationToken = default)
     {
-        var exists = await _context.StaffMembers.AnyAsync(s => s.EmployeeCode == dto.EmployeeCode.Trim(), cancellationToken);
+        if (string.IsNullOrWhiteSpace(dto.EmployeeCode))
+        {
+            return ApiResponse<StaffDto>.Fail("Employee code is required.");
+        }
+
+        var exists = await _context.StaffMembers
+            .IgnoreQueryFilters()
+            .AnyAsync(s => s.EmployeeCode.ToLower() == dto.EmployeeCode.Trim().ToLower() && !s.IsDeleted, cancellationToken);
         if (exists)
         {
             return ApiResponse<StaffDto>.Fail($"Employee code '{dto.EmployeeCode}' is already registered.");
         }
 
+        // Clean empty GUIDs
+        var deptId = (dto.DepartmentId.HasValue && dto.DepartmentId.Value != Guid.Empty) ? dto.DepartmentId : null;
+        var reportsToId = (dto.ReportsToStaffId.HasValue && dto.ReportsToStaffId.Value != Guid.Empty) ? dto.ReportsToStaffId : null;
+
+        // Resolve TenantId & InstitutionId with robust fallbacks
+        var tenantId = _currentTenantService.TenantId;
+        var institutionId = _currentTenantService.InstitutionId;
+
+        if (!tenantId.HasValue && _currentTenantService.UserId.HasValue)
+        {
+            var tm = await _context.TenantMemberships.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(m => m.UserId == _currentTenantService.UserId.Value && m.IsActive, cancellationToken);
+            tenantId = tm?.TenantId;
+        }
+
+        if (!institutionId.HasValue && _currentTenantService.UserId.HasValue)
+        {
+            var im = await _context.InstitutionMemberships.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(m => m.UserId == _currentTenantService.UserId.Value && m.IsActive, cancellationToken);
+            institutionId = im?.InstitutionId;
+        }
+
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+        {
+            var defaultTenant = await _context.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(cancellationToken);
+            tenantId = defaultTenant?.Id;
+        }
+
+        if (!institutionId.HasValue || institutionId.Value == Guid.Empty)
+        {
+            var defaultInst = await _context.Institutions.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(i => i.TenantId == tenantId && !i.IsDeleted, cancellationToken);
+            institutionId = defaultInst?.Id;
+        }
+
         Guid? createdUserId = null;
 
         // Optionally create application user login for staff
-        var existingUser = await _userManager.FindByEmailAsync(dto.Email.Trim());
-        if (existingUser == null)
+        if (!string.IsNullOrWhiteSpace(dto.Email))
         {
-            var user = new ApplicationUser
+            var existingUser = await _userManager.FindByEmailAsync(dto.Email.Trim());
+            if (existingUser == null)
             {
-                UserName = dto.Email.Trim(),
-                Email = dto.Email.Trim(),
-                FirstName = dto.FirstName.Trim(),
-                LastName = dto.LastName.Trim(),
-                PhoneNumber = dto.Phone.Trim(),
-                PrimaryRole = dto.Role,
-                IsActive = true
-            };
-
-            var userResult = await _userManager.CreateAsync(user, "Staff@123456");
-            if (userResult.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(user, dto.Role.ToString());
-                createdUserId = user.Id;
-
-                if (_currentTenantService.TenantId.HasValue)
+                var user = new ApplicationUser
                 {
-                    await _context.TenantMemberships.AddAsync(new TenantMembership
-                    {
-                        TenantId = _currentTenantService.TenantId.Value,
-                        UserId = user.Id,
-                        Role = dto.Role,
-                        IsActive = true
-                    }, cancellationToken);
+                    UserName = dto.Email.Trim(),
+                    Email = dto.Email.Trim(),
+                    FirstName = dto.FirstName.Trim(),
+                    LastName = dto.LastName.Trim(),
+                    PhoneNumber = dto.Phone?.Trim() ?? string.Empty,
+                    PrimaryRole = dto.Role,
+                    IsActive = true
+                };
 
-                    if (_currentTenantService.InstitutionId.HasValue)
+                var userResult = await _userManager.CreateAsync(user, "Staff@123456");
+                if (userResult.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, dto.Role.ToString());
+                    createdUserId = user.Id;
+
+                    if (tenantId.HasValue && tenantId.Value != Guid.Empty)
                     {
-                        await _context.InstitutionMemberships.AddAsync(new InstitutionMembership
+                        await _context.TenantMemberships.AddAsync(new TenantMembership
                         {
-                            TenantId = _currentTenantService.TenantId.Value,
-                            InstitutionId = _currentTenantService.InstitutionId.Value,
+                            TenantId = tenantId.Value,
                             UserId = user.Id,
                             Role = dto.Role,
                             IsActive = true
                         }, cancellationToken);
+
+                        if (institutionId.HasValue && institutionId.Value != Guid.Empty)
+                        {
+                            await _context.InstitutionMemberships.AddAsync(new InstitutionMembership
+                            {
+                                TenantId = tenantId.Value,
+                                InstitutionId = institutionId.Value,
+                                UserId = user.Id,
+                                Role = dto.Role,
+                                IsActive = true
+                            }, cancellationToken);
+                        }
                     }
                 }
+                else
+                {
+                    var errorMessages = string.Join("; ", userResult.Errors.Select(e => e.Description));
+                    return ApiResponse<StaffDto>.Fail($"Unable to create user login for staff: {errorMessages}");
+                }
             }
-        }
-        else
-        {
-            createdUserId = existingUser.Id;
+            else
+            {
+                createdUserId = existingUser.Id;
+            }
         }
 
         var staff = new Staff
         {
+            TenantId = tenantId ?? Guid.Empty,
+            InstitutionId = institutionId ?? Guid.Empty,
             UserId = createdUserId,
             EmployeeCode = dto.EmployeeCode.Trim(),
             FirstName = dto.FirstName.Trim(),
             LastName = dto.LastName.Trim(),
             Designation = dto.Designation.Trim(),
-            DepartmentId = dto.DepartmentId,
+            DepartmentId = deptId,
             Qualification = dto.Qualification?.Trim(),
-            Email = dto.Email.Trim(),
-            Phone = dto.Phone.Trim(),
+            Email = dto.Email?.Trim() ?? string.Empty,
+            Phone = dto.Phone?.Trim() ?? string.Empty,
             JoiningDate = dto.JoiningDate,
-            ReportsToStaffId = dto.ReportsToStaffId,
+            ReportsToStaffId = reportsToId,
             IsActive = true
         };
 

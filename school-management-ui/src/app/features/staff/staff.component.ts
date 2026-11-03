@@ -474,13 +474,13 @@ import { Staff, Department, PagedResult, StaffHierarchyNode } from '../../core/m
                 <div class="form-group">
                   <label class="form-label">System Role *</label>
                   <select class="form-control" [(ngModel)]="newStaff.role" (change)="onRoleChange()" name="role">
-                    <option [value]="7">👑 Director (Executive Directorate)</option>
-                    <option [value]="8">🏛️ Principal (Head of Institution)</option>
-                    <option [value]="9">🎖️ Vice Principal (Operations / Dean)</option>
-                    <option [value]="10">📚 Head of Department (HOD)</option>
-                    <option [value]="3">👨‍🏫 Teacher / Faculty Educator</option>
-                    <option [value]="4">💼 Accountant / Finance</option>
-                    <option [value]="2">🏢 Institution Administrator</option>
+                    <option [ngValue]="7">👑 Director (Executive Directorate)</option>
+                    <option [ngValue]="8">🏛️ Principal (Head of Institution)</option>
+                    <option [ngValue]="9">🎖️ Vice Principal (Operations / Dean)</option>
+                    <option [ngValue]="10">📚 Head of Department (HOD)</option>
+                    <option [ngValue]="3">👨‍🏫 Teacher / Faculty Educator</option>
+                    <option [ngValue]="4">💼 Accountant / Finance</option>
+                    <option [ngValue]="2">🏢 Institution Administrator</option>
                   </select>
                 </div>
               </div>
@@ -940,9 +940,41 @@ export class StaffComponent implements OnInit {
 
   submitStaff(): void {
     this.modalError = '';
+
+    if (!this.newStaff.employeeCode?.trim()) {
+      this.modalError = 'Employee Code is required.';
+      return;
+    }
+    if (!this.newStaff.firstName?.trim()) {
+      this.modalError = 'First Name is required.';
+      return;
+    }
+    if (!this.newStaff.lastName?.trim()) {
+      this.modalError = 'Last Name is required.';
+      return;
+    }
+    if (!this.newStaff.email?.trim()) {
+      this.modalError = 'Official Email is required.';
+      return;
+    }
+
     this.submitting = true;
 
-    this.api.createStaff(this.newStaff).subscribe({
+    const payload = {
+      employeeCode: this.newStaff.employeeCode.trim(),
+      firstName: this.newStaff.firstName.trim(),
+      lastName: this.newStaff.lastName.trim(),
+      designation: this.newStaff.designation?.trim() || 'Senior Teacher',
+      email: this.newStaff.email.trim(),
+      phone: this.newStaff.phone?.trim() || '',
+      role: Number(this.newStaff.role) || 3,
+      qualification: this.newStaff.qualification?.trim() || '',
+      departmentId: (this.newStaff.departmentId && this.newStaff.departmentId !== 'null' && this.newStaff.departmentId !== '') ? this.newStaff.departmentId : null,
+      reportsToStaffId: (this.newStaff.reportsToStaffId && this.newStaff.reportsToStaffId !== 'null' && this.newStaff.reportsToStaffId !== '') ? this.newStaff.reportsToStaffId : null,
+      joiningDate: this.newStaff.joiningDate || new Date().toISOString()
+    };
+
+    this.api.createStaff(payload).subscribe({
       next: (res) => {
         this.submitting = false;
         if (res.success) {
@@ -952,13 +984,31 @@ export class StaffComponent implements OnInit {
           if (this.activeTab === 'tree') {
             this.loadHierarchy();
           }
+          this.newStaff = {
+            employeeCode: '',
+            designation: 'Senior Teacher',
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            departmentId: null,
+            role: 3,
+            reportsToStaffId: null,
+            qualification: '',
+            joiningDate: new Date().toISOString()
+          };
         } else {
           this.modalError = res.message || 'Failed to add staff';
         }
       },
       error: (err) => {
         this.submitting = false;
-        this.modalError = err.error?.message || 'Server error';
+        let msg = err.error?.message;
+        if (!msg && err.error?.errors) {
+          const errs = err.error.errors;
+          msg = Object.keys(errs).map(k => errs[k].join(', ')).join('; ');
+        }
+        this.modalError = msg || err.message || 'Server error occurred while adding staff';
       }
     });
   }
